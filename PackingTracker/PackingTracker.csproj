@@ -44,6 +44,12 @@
     <CheckForOverflowUnderflow>False</CheckForOverflowUnderflow>
     <DefineConstants>TRACE</DefineConstants>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="EntityFramework">
       <HintPath>..\packages\EntityFramework.6.2.0\lib\net45\EntityFramework.dll</HintPath>
@@ -79,11 +85,20 @@
     <Reference Include="System.Xml.Linq">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
+    <Reference Include="zxing, Version=0.16.4.0, Culture=neutral, PublicKeyToken=4e88037ac681fe60, processorArchitecture=MSIL">
+      <HintPath>..\packages\ZXing.Net.0.16.4\lib\net45\zxing.dll</HintPath>
+    </Reference>
+    <Reference Include="zxing.presentation, Version=0.16.4.0, Culture=neutral, PublicKeyToken=4e88037ac681fe60, processorArchitecture=MSIL">
+      <HintPath>..\packages\ZXing.Net.0.16.4\lib\net45\zxing.presentation.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Common\Constants.cs" />
+    <Compile Include="Common\Convert.cs" />
     <Compile Include="Common\DBHelper.cs" />
+    <Compile Include="Common\LPPrint.cs" />
     <Compile Include="Common\SharedApp.cs" />
+    <Compile Include="Common\ZPLII.cs" />
     <Compile Include="Entity\Account.cs" />
     <Compile Include="Entity\AddDevBinding.cs" />
     <Compile Include="Entity\Box.cs" />
@@ -92,6 +107,11 @@
     <Compile Include="Entity\Order.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <DependentUpon>Settings.settings</DependentUpon>
+    </Compile>
     <Compile Include="UI\BoxListFrm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -116,10 +136,26 @@
     <Compile Include="UI\PackingFrm.Designer.cs">
       <DependentUpon>PackingFrm.cs</DependentUpon>
     </Compile>
+    <Compile Include="UI\PrintFrm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UI\PrintFrm.Designer.cs">
+      <DependentUpon>PrintFrm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UI\PrintItemFrm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UI\PrintItemFrm.Designer.cs">
+      <DependentUpon>PrintItemFrm.cs</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
     <None Include="packages.config" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
@@ -134,6 +170,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="UI\PackingFrm.resx">
       <DependentUpon>PackingFrm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UI\PrintFrm.resx">
+      <DependentUpon>PrintFrm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UI\PrintItemFrm.resx">
+      <DependentUpon>PrintItemFrm.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

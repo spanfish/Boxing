@@ -29,10 +29,10 @@ namespace PackingTracker.Entity
 	
 	public class OrderDetail
     {
-        /**
-        * 订单编码
-        **/
-		public string AgreementId
+        /// <summary>
+        /// 订单编码
+        /// </summary>
+        public string AgreementId
         {
             get;
             set;
@@ -126,13 +126,26 @@ namespace PackingTracker.Entity
             get;
             set;
         }
+
+        /// <summary>
+        /// 古北编码
+        /// </summary>
 		public string MaterialCode
         {
             get;
             set;
         }
-		
-		public string OEMFactoryId
+
+        /// <summary>
+        /// 客户编码
+        /// </summary>
+        public string KehuCode
+        {
+            get;
+            set;
+        }
+
+        public string OEMFactoryId
         {
             get;
             set;
@@ -185,13 +198,30 @@ namespace PackingTracker.Entity
             get;
             set;
         }
+
+        /// <summary>
+        /// 产品型号
+        /// </summary>
+        [DeserializeAs(Name = "DummyProductModel")]
         public string ProductModel
         {
             get;
             set;
         }
-        
+
+        /// <summary>
+        /// 产品名称
+        /// </summary>
         public string ProductName
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// 产品描述
+        /// </summary>
+        public string ProductDesc
         {
             get;
             set;
@@ -219,7 +249,75 @@ namespace PackingTracker.Entity
             get;
             set;
         }
+        /// <summary>
+        /// 工单
+        /// </summary>
         public string Workform
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// 供应商
+        /// </summary>
+        public string Supplier
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// Ver
+        /// </summary>
+        public string ProductVerTag
+        {
+            get;
+            set;
+        }
+        /// <summary>
+        /// 批次号
+        /// </summary>
+        public string BatchNo
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// 固件
+        /// </summary>
+        public string Firmware
+        {
+            get;
+            set;
+        }
+
+        public string Custom1
+        {
+            get;
+            set;
+        }
+
+        public string Custom2
+        {
+            get;
+            set;
+        }
+
+        public string Custom3
+        {
+            get;
+            set;
+        }
+
+        public string Custom4
+        {
+            get;
+            set;
+        }
+
+        public string Custom5
         {
             get;
             set;

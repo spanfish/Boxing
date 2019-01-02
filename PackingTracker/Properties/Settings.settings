@@ -1,0 +1,42 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="com.newtronics.Properties" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="HeadFontName" Type="System.String" Scope="User">
+      <Value Profile="(Default)">楷体</Value>
+    </Setting>
+    <Setting Name="HeadFontSize" Type="System.String" Scope="User">
+      <Value Profile="(Default)">24</Value>
+    </Setting>
+    <Setting Name="HeadFontStyle" Type="System.String" Scope="User">
+      <Value Profile="(Default)">粗体</Value>
+    </Setting>
+    <Setting Name="TitleFontName" Type="System.String" Scope="User">
+      <Value Profile="(Default)">楷体</Value>
+    </Setting>
+    <Setting Name="TitleFontSize" Type="System.String" Scope="User">
+      <Value Profile="(Default)">20</Value>
+    </Setting>
+    <Setting Name="TitleFontStyle" Type="System.String" Scope="User">
+      <Value Profile="(Default)">粗体</Value>
+    </Setting>
+    <Setting Name="FieldFontName" Type="System.String" Scope="User">
+      <Value Profile="(Default)">楷体</Value>
+    </Setting>
+    <Setting Name="FieldFontSize" Type="System.String" Scope="User">
+      <Value Profile="(Default)">20</Value>
+    </Setting>
+    <Setting Name="FieldFontStyle" Type="System.String" Scope="User">
+      <Value Profile="(Default)">粗体</Value>
+    </Setting>
+    <Setting Name="LineSpace" Type="System.String" Scope="User">
+      <Value Profile="(Default)">0</Value>
+    </Setting>
+    <Setting Name="LeftMargin" Type="System.String" Scope="User">
+      <Value Profile="(Default)">10</Value>
+    </Setting>
+    <Setting Name="TopMargin" Type="System.String" Scope="User">
+      <Value Profile="(Default)">15</Value>
+    </Setting>
+  </Settings>
+</SettingsFile>

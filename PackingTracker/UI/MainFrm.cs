@@ -1,26 +1,18 @@
-﻿using System;
+﻿using PackingTracker.Common;
+using PackingTracker.Entity;
+using RestSharp;
+using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
 using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-using System.Security.Cryptography;
-
-using RestSharp;
-
-using PackingTracker.Common;
-using PackingTracker.Entity;
 
 namespace PackingTracker.UI
 {
-	/// <summary>
-	/// Description of MainFrm.
-	/// </summary>
-	public partial class MainFrm : Form
+    /// <summary>
+    /// Description of MainFrm.
+    /// </summary>
+    public partial class MainFrm : Form
 	{
 		private RestClient client;
 		
@@ -118,10 +110,10 @@ namespace PackingTracker.UI
                 orderDataGridView.AllowUserToAddRows = false;
                 ListOrder(0);
 			}
-			#endregion
-		}
-		
-		void ListOrder(int ind)
+            #endregion
+        }
+
+        void ListOrder(int ind)
 		{
             nextPageButton.Enabled = prePageButton.Enabled = refreshButton.Enabled = false;
             if (ind < 0)

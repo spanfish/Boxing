@@ -137,6 +137,7 @@ namespace PackingTracker.UI
             this.Controls.Add(this.tableLayoutPanel1);
             this.Name = "MainFrm";
             this.Text = "装箱管理系统";
+            this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
             this.Load += new System.EventHandler(this.MainFrmLoad);
             ((System.ComponentModel.ISupportInitialize)(this.orderDataGridView)).EndInit();
             this.tableLayoutPanel1.ResumeLayout(false);

@@ -143,6 +143,7 @@ namespace PackingTracker.UI
             this.printLabelButon.TabIndex = 6;
             this.printLabelButon.Text = "打印标签";
             this.printLabelButon.UseVisualStyleBackColor = true;
+            this.printLabelButon.Click += new System.EventHandler(this.printLabelButon_Click);
             // 
             // label3
             // 
@@ -347,6 +348,7 @@ namespace PackingTracker.UI
             this.Controls.Add(this.label1);
             this.Name = "PackingFrm";
             this.Text = "装箱";
+            this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
             this.Load += new System.EventHandler(this.PackingFrmLoad);
             ((System.ComponentModel.ISupportInitialize)(this.deviceDataGridView)).EndInit();
             this.ResumeLayout(false);

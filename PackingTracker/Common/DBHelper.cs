@@ -26,60 +26,75 @@ namespace PackingTracker.Common
                 return instance;
             }
         }
-		
-        /// <summary>
-        /// 向箱内添加设备
-        /// </summary>
-        /// <param name="orderId"></param>
-        /// <param name="boxSN"></param>
-        /// <param name="did"></param>
-        /// <returns></returns>
-		public int AddDevice(string orderId, string boxSN, string did)
-		{
-			int ret = 0;
-			if(String.IsNullOrEmpty(orderId) || String.IsNullOrEmpty(boxSN) || String.IsNullOrEmpty(did))
-			{
-				return ret;
-			}
-			using (var conn = new SQLiteConnection("Data Source=" + FilePath))
-			{
-				try
-				{
-					conn.Open();
-					
-					using (SQLiteCommand command = conn.CreateCommand())
-                    {
-                        command.CommandText = "insert into boxing(OrderId, BoxSN, DID, Status) values (@OrderId, @BoxSN, @DID, 0)";
-                        command.Parameters.Add("@OrderId", DbType.String);
-                        command.Parameters.Add("@BoxSN", DbType.String);
-                        command.Parameters.Add("@DID", DbType.String);
 
-                        command.Parameters["@OrderId"].Value = orderId;
-                        command.Parameters["@BoxSN"].Value = boxSN;
-                        command.Parameters["@DID"].Value = did;
-                        ret = command.ExecuteNonQuery();
-                    }
-				}
-				catch(Exception)
-				{
-					
-				}
-				finally
-				{
-					if (conn != null)
+        public DataTable GetTable(string table)
+        {
+            DataTable dt = null;
+            if (File.Exists(FilePath))
+            {
+                using (var conn = new SQLiteConnection("Data Source=" + FilePath))
+                {
+                    try
                     {
-                        conn.Close();
+                        conn.Open();
+
+                        using (SQLiteCommand command = conn.CreateCommand())
+                        {
+                            command.CommandText = "SELECT * from " + table;
+
+                            using (SQLiteDataReader dr = command.ExecuteReader())
+                            {
+                                if(dr != null)
+                                {
+                                    dt.Load(dr);
+                                }
+                            }
+                                
+                        }
                     }
-				}
-			}
-			
-			return ret;
-		}
-		
-		/// <summary>
-		/// 初始化数据库
-		/// </summary>
-		private void CreateDB()
+                    finally
+                    {
+                        if (conn != null)
+                        {
+                            conn.Close();
+                        }
+                    }
+                }
+            }
+
+            return dt;
+        }
+       
+        public SQLiteConnection Open()
+        {
+            if (!File.Exists(FilePath))
+            {
+                return null;
+            }
+            var conn = new SQLiteConnection("Data Source=" + FilePath);
+
+            try
+            {
+                conn.Open();
+            }
+            finally
+            {
+
+            }
+            return conn;
+        }
+
+        public void Close(SQLiteConnection conn)
+        {
+            if (conn != null)
+            { 
+                conn.Close();
+            }
+        }
+        /// <summary>
+        /// 初始化数据库
+        /// </summary>
+        private void CreateDB()
 		{
 			if (!File.Exists(FilePath))
 			{
@@ -98,8 +113,11 @@ namespace PackingTracker.Common
                             command.CommandText = "create table boxing(OrderId TEXT, BoxSN Text, DID TEXT, Status Integer, PRIMARY KEY (OrderId, BoxSN))";
                             command.ExecuteNonQuery();
 
-                            //command.CommandText = "create table Print(Id TEXT, Name Text, DispSeq INTEGER, DispText Text, BarCode TEXT, PRIMARY KEY (Id, Name))";
-                            //command.ExecuteNonQuery();
+                            command.CommandText = "create table Setting(Id TEXT, Name Text, DefValue TEXT, PRIMARY KEY (Id, Name))";
+                            command.ExecuteNonQuery();
+
+                            command.CommandText = "create table Print(Id TEXT, Name Text, DispSeq INTEGER, DispText Text, BarCode TEXT, PRIMARY KEY (Id, Name))";
+                            command.ExecuteNonQuery();
                         }
 					}
 					finally
@@ -112,5 +130,5 @@ namespace PackingTracker.Common
 				}
 			}
 		}
-	}
+    }
 }

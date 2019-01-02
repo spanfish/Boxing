@@ -1,4 +1,4 @@
-﻿using System;
+﻿using System.Threading;
 using System.Collections.Generic;
 
 namespace PackingTracker.Entity
@@ -59,31 +59,33 @@ namespace PackingTracker.Entity
 
         public List<string> BoxSN { get; set; }
 	}
-	
-	public class BoxDetail
-	{
-		public string BoxType { get; set; }
+
+    public class BoxDetail
+    {
+        public string BoxType { get; set; }
 
         public string BoxSN { get; set; }
 
-		public string Oemfactoryid { get; set; }
-		
-		public string Requserid { get; set; }
-		
+        public string Oemfactoryid { get; set; }
+
+        public string Requserid { get; set; }
+
         public string OrderId { get; set; }
-        
+
         public string CreateTime { get; set; }
-        
+
         public string FinishTime { get; set; }
-        
+
         public string Status { get; set; }
-        
+
         public int Occupied { get; set; }
-        
+
         public int Capacity { get; set; }
-        
+
         public int RealCount { get; set; }
-	}
+
+        public CancellationToken Token{get;set;}
+    }
 	
 	/// <summary>
 	/// 箱子信息查询

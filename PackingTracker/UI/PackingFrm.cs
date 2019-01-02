@@ -14,6 +14,7 @@ using RestSharp;
 using PackingTracker.Common;
 using PackingTracker.Entity;
 using com.newtronics.Entity;
+using com.newtronics.UI;
 
 namespace PackingTracker.UI
 {
@@ -25,24 +26,24 @@ namespace PackingTracker.UI
 		private RestClient client;
 		
 		private readonly SynchronizationContext synchronizationContext;
-		
-		//public OrderDetail OrderDetail
-		//{
-		//	get;
-		//	set;
-		//}
-		
-		public Box Box
+
+        public OrderDetail OrderDetail
+        {
+            get;
+            set;
+        }
+
+        public Box Box
 		{
 			get;
 			set;
 		}
 
-        public PackingFrm(): this(null)
+        public PackingFrm(): this(null, null)
         {
         }
 
-        public PackingFrm(BoxDetail boxDetail)
+        public PackingFrm(BoxDetail boxDetail, OrderDetail od)
 		{
 			//
 			// The InitializeComponent() call is required for Windows Forms designer support.
@@ -53,8 +54,9 @@ namespace PackingTracker.UI
             //箱子详细
             this.Box = new Box();
             this.Box.retdata.BoxInfo = boxDetail;
-			
-			synchronizationContext = SynchronizationContext.Current;
+            this.OrderDetail = od;
+
+            synchronizationContext = SynchronizationContext.Current;
 			
             string host = Constants.Host;
             client = new RestClient(host);
@@ -79,8 +81,7 @@ namespace PackingTracker.UI
 
         void UpdateDevView()
         {
-            //this.Box.retdata.DevInfo
-            deviceDataGridView.RowCount = (this.Box.retdata.DevInfo.Count+9)/10;
+            deviceDataGridView.RowCount = (this.Box.retdata.DevInfo == null ? 0 : this.Box.retdata.DevInfo.Count+9)/10;
             deviceDataGridView.Invalidate();
             for (int i = 1; i <= deviceDataGridView.Rows.Count; i++)
             {
@@ -171,44 +172,49 @@ namespace PackingTracker.UI
             request.OnBeforeDeserialization = resp => { resp.ContentType = "application/json"; };
             request.ReadWriteTimeout = 5000;
 
-            IRestResponse<Box> res = client.Execute<Box>(request);
-
-            if (res.IsSuccessful)
+            var asyncHandle = client.ExecuteAsync<Box>(request, res =>
             {
-                Box box = res.Data;
-                if (box != null && box.retdata != null)
+                if (res.IsSuccessful)
                 {
-                    if (box.Status != 0)
+                    Box box = res.Data;
+                    if (box != null && box.retdata != null)
                     {
-                        ShowError(String.Format("Error:{0}, {1}", box.Status, box.Msg));
+                        if (box.Status != 0)
+                        {
+                            ShowError(String.Format("Error:{0}, {1}", box.Status, box.Msg));
+                        }
+                        else
+                        {
+                            synchronizationContext.Post(new SendOrPostCallback(o =>
+                            {
+                                RetData b = o as RetData;
+                                if (b != null)
+                                {
+                                    this.Box.retdata.Count = b.Count;
+                                    this.Box.retdata.DevInfo = b.DevInfo;
+                                    UpdateDevView();
+                                }
+                                else
+                                {
+                                    ShowError("无法查询箱内设备");
+                                }
+                            }), box.retdata);
+                        }
                     }
                     else
                     {
-                        synchronizationContext.Post(new SendOrPostCallback(o =>
-                        {
-                            RetData b = o as RetData;
-                            if(b != null)
-                            {
-                                this.Box.retdata.Count = b.Count;
-                                this.Box.retdata.DevInfo = b.DevInfo;
-                                UpdateDevView();
-                            }
-                            else
-                            {
-                                ShowError("无法查询箱内设备");
-                            }
-                        }), box.retdata);
+                        ShowError("无法转换为JSON");
                     }
                 }
                 else
                 {
-                    ShowError("无法转换为JSON");
+                    ShowError("未知错误");
                 }
-            }
-            else
-            {
-                ShowError("未知错误");
-            }
+            });
+
+            //IRestResponse<Box> res = client.Execute<Box>(request);
+
+            
         }
 
 
@@ -315,7 +321,7 @@ namespace PackingTracker.UI
 		{
 			if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar))
 		    {
-		            e.Handled = true;
+		        e.Handled = true;
 		    }
 		}
 		
@@ -329,9 +335,8 @@ namespace PackingTracker.UI
 			if(e.KeyCode == Keys.Enter)
 			{
 				AddDeviceToLocalBox(deviceInputTextBox.Text);
-			}
-
-            this.deviceInputTextBox.SelectAll();
+                this.deviceInputTextBox.SelectAll();
+            }
 		}
 		
 		void AddDeviceToLocalBox(string did)
@@ -343,7 +348,6 @@ namespace PackingTracker.UI
 			}
 
             AddDeviceToBox(did);
-
         }
 		
 		void AddDeviceToBox(string did)
@@ -381,9 +385,14 @@ namespace PackingTracker.UI
                     MessageBeep(0xFFFFFFFF);
                     synchronizationContext.Post(new SendOrPostCallback(o =>
                     {
-                        msgLabel.Text = "无法添加设备";
+                        string msg = o as string;
+                        if(String.IsNullOrEmpty(msg))
+                        {
+                            msg = "无法添加设备";
+                        }
+                        msgLabel.Text = msg;
 
-                    }), null);
+                    }), b.Msg);
                 }
                 else
                 {
@@ -423,5 +432,11 @@ namespace PackingTracker.UI
 
             }), errMsg);
 		}
-	}
+
+        private void printLabelButon_Click(object sender, EventArgs e)
+        {
+            PrintFrm printFrm = new PrintFrm(this.Box.retdata.BoxInfo.BoxSN, OrderDetail);
+            printFrm.ShowDialog(this);
+        }
+    }
 }
