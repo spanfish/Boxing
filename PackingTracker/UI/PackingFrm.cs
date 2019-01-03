@@ -39,6 +39,8 @@ namespace PackingTracker.UI
 			set;
 		}
 
+        private int realCount;
+
         public PackingFrm(): this(null, null)
         {
         }
@@ -123,7 +125,16 @@ namespace PackingTracker.UI
 
             boxSizeTextBox.Text = String.Format("{0}", this.Box.retdata.BoxInfo.Capacity);
             realCountTextBox.Text = String.Format("{0}", this.Box.retdata.BoxInfo.RealCount);
+            realCount = this.Box.retdata.BoxInfo.RealCount;
 
+            if(this.Box.retdata.BoxInfo.BoxType == Constants.BoxTypeInner)
+            {
+                prompLabel.Text = "请输入DID/MAC";
+            }
+            else
+            {
+                prompLabel.Text = "请输入内箱号";
+            }
             //若无箱号，新建箱子
             if (String.IsNullOrEmpty(this.Box.retdata.BoxInfo.BoxSN))
             {
@@ -144,6 +155,9 @@ namespace PackingTracker.UI
             }
         }
 
+        /// <summary>
+        /// 查询箱内设备
+        /// </summary>
         void QueryBoxDev()
         {
             var request = new RestRequest("dlicense/v2/manu/boxing/listinnerdev", Method.POST);
@@ -181,7 +195,7 @@ namespace PackingTracker.UI
                     {
                         if (box.Status != 0)
                         {
-                            ShowError(String.Format("Error:{0}, {1}", box.Status, box.Msg));
+                            ShowError(box.Status);
                         }
                         else
                         {
@@ -196,19 +210,19 @@ namespace PackingTracker.UI
                                 }
                                 else
                                 {
-                                    ShowError("无法查询箱内设备");
+                                    ShowError(-1);
                                 }
                             }), box.retdata);
                         }
                     }
                     else
                     {
-                        ShowError("无法转换为JSON");
+                        ShowError(-1);
                     }
                 }
                 else
                 {
-                    ShowError("未知错误");
+                    ShowError(-1);
                 }
             });
 
@@ -218,8 +232,12 @@ namespace PackingTracker.UI
         }
 
 
-		
-		void PackingCompButonClick(object sender, EventArgs e)
+        /// <summary>
+        /// 完成装箱
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        void PackingCompButonClick(object sender, EventArgs e)
 		{
 	
 		}
@@ -276,7 +294,7 @@ namespace PackingTracker.UI
 	                {
 	                	if(box.Status != 0)
 	                	{
-	                		ShowError(String.Format("Error:{0}, {1}", box.Status, box.Msg));
+	                		ShowError(box.Status);
 	                	}
 	                	else
 	                	{
@@ -285,7 +303,7 @@ namespace PackingTracker.UI
 		                	    BoxDetail boxDetail = o as BoxDetail;
                                 if(boxDetail == null)
                                 {
-                                    ShowError("无法申请箱号");
+                                    ShowError(-1);
                                 }
                                 else
                                 {
@@ -298,12 +316,12 @@ namespace PackingTracker.UI
 	                }
 	                else
 	                {
-	                	ShowError("无法转换为JSON");
+	                	ShowError(-1);
 	                }
 	            }
 	            else
                 {
-                	ShowError("未知错误");
+                	ShowError(-1);
                 }
 	        });
 		}
@@ -334,12 +352,20 @@ namespace PackingTracker.UI
 		{
 			if(e.KeyCode == Keys.Enter)
 			{
-				AddDeviceToLocalBox(deviceInputTextBox.Text);
+                
+                if (this.Box.retdata.BoxInfo.BoxType == Constants.BoxTypeInner)
+                {
+                    AddDevToBox(deviceInputTextBox.Text);
+                }
+                else
+                {
+                    AddInnerToOutterBox(deviceInputTextBox.Text);
+                }
                 this.deviceInputTextBox.SelectAll();
             }
 		}
 		
-		void AddDeviceToLocalBox(string did)
+		void AddDevToBox(string did)
 		{
 			if(String.IsNullOrEmpty(did))
 			{
@@ -349,8 +375,84 @@ namespace PackingTracker.UI
 
             AddDeviceToBox(did);
         }
-		
-		void AddDeviceToBox(string did)
+
+        /// <summary>
+        /// 外箱添加内箱
+        /// </summary>
+        /// <param name="did"></param>
+        void AddInnerToOutterBox(string did)
+        {
+            var request = new RestRequest("dlicense/v2/manu/boxing/addboxbinding", Method.POST);
+            request.RequestFormat = DataFormat.Json;
+            request.AddHeader("reqUserId", SharedApp.Instance.Login.Userid);
+            request.AddHeader("reqUserSession", SharedApp.Instance.Login.Loginsession);
+            request.AddHeader("grouptype", SharedApp.Instance.AccountDetail.Grouptype);
+            request.AddHeader("OemfactoryId", SharedApp.Instance.AccountDetail.OemfactoryId);
+
+            StringBuilder sb = new StringBuilder();
+            sb.Append("{");
+            sb.Append("\"pboxsn\":");
+            sb.Append("\"").Append(this.Box.retdata.BoxInfo.BoxSN).Append("\",");
+
+            sb.Append("\"boxsns\":");
+            sb.Append("[");
+            sb.Append("\"").Append(did).Append("\"");
+            sb.Append("]");
+            sb.Append("}");
+
+            string body = sb.ToString();
+            request.AddParameter("application/json", body, ParameterType.RequestBody);
+            request.OnBeforeDeserialization = resp => { resp.ContentType = "application/json"; };
+            request.ReadWriteTimeout = 5000;
+            IRestResponse<AddDevBinding> res = client.Execute<AddDevBinding>(request);
+            if (res.IsSuccessful)
+            {
+                AddDevBinding b = res.Data;
+                if (b == null || b.Status != 0)
+                {
+                    MessageBeep(0xFFFFFFFF);
+                    string errMsg = null;
+                    if (b != null)
+                    {
+                        errMsg = Constants.GetError(b.Status);
+                    }
+                    synchronizationContext.Post(new SendOrPostCallback(o =>
+                    {
+                        string msg = o as string;
+                        if (String.IsNullOrEmpty(msg))
+                        {
+                            msg = "无法添加内箱";
+                        }
+                        msgLabel.Text = msg;
+
+                    }), errMsg);
+                }
+                else
+                {
+                    synchronizationContext.Post(new SendOrPostCallback(o =>
+                    {
+                        this.deviceInputTextBox.Clear();
+                        msgLabel.Text = "成功添加内箱";
+                        realCount++;
+                        if (realCount == this.Box.retdata.BoxInfo.Capacity)
+                        {
+                            printLabelButon_Click(null, null);
+                        }
+                    }), null);
+                }
+            }
+            else
+            {
+                MessageBeep(0xFFFFFFFF);
+                synchronizationContext.Post(new SendOrPostCallback(o =>
+                {
+                    msgLabel.Text = "无法添加设备";
+
+                }), null);
+            }
+        }
+
+        void AddDeviceToBox(string did)
 		{
             var request = new RestRequest("dlicense/v2/manu/boxing/adddevbinding", Method.POST);
             request.RequestFormat = DataFormat.Json;
@@ -383,6 +485,11 @@ namespace PackingTracker.UI
                 if (b == null || b.Status != 0)
                 {
                     MessageBeep(0xFFFFFFFF);
+                    string errMsg = null;
+                    if(b!=null)
+                    {
+                        errMsg = Constants.GetError(b.Status);
+                    }
                     synchronizationContext.Post(new SendOrPostCallback(o =>
                     {
                         string msg = o as string;
@@ -392,14 +499,20 @@ namespace PackingTracker.UI
                         }
                         msgLabel.Text = msg;
 
-                    }), b.Msg);
+                    }), errMsg);
                 }
                 else
                 {
                     synchronizationContext.Post(new SendOrPostCallback(o =>
                     {
+                        this.deviceInputTextBox.Clear();
                         msgLabel.Text = "成功添加设备";
-
+                        QueryBoxDev();
+                        realCount++;
+                        if(this.Box.retdata.Count == this.Box.retdata.BoxInfo.Capacity)
+                        {
+                            printLabelButon_Click(null, null);
+                        }
                     }), null);
                 }
             }
@@ -417,10 +530,12 @@ namespace PackingTracker.UI
         [System.Runtime.InteropServices.DllImport("user32.dll")]
         private static extern int MessageBeep(uint n);
 
-        private void ShowError(string errMsg)
+        private void ShowError(int errCode)
 		{
+            string errMsg = Constants.GetError(errCode);
 			synchronizationContext.Post(new SendOrPostCallback(o =>
             {
+
 				string msg = o as string;
                 if (msg == null)
                 {
@@ -437,6 +552,14 @@ namespace PackingTracker.UI
         {
             PrintFrm printFrm = new PrintFrm(this.Box.retdata.BoxInfo.BoxSN, OrderDetail);
             printFrm.ShowDialog(this);
+        }
+
+        private void PackingFrm_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Escape)
+            {
+                this.Close();
+            }
         }
     }
 }

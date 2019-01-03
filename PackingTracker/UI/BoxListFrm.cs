@@ -230,24 +230,24 @@ namespace PackingTracker.UI
                 DataGridViewColumn column = boxDataGridView.Columns[e.ColumnIndex];
                 string propertyName = column.DataPropertyName;
                 e.Value = GetPropValue(box, propertyName);
-                await GetBoxDetail(cts.Token, e.RowIndex);
+
+                if (String.IsNullOrEmpty(box.CreateTime))
+                {
+                    await GetBoxDetail(cts.Token, e.RowIndex);
+                }                
             }
         }
 
-        private async Task GetBoxDetail(CancellationToken cancelToken, int rowIndex)
+        private async Task<int> GetBoxDetail(CancellationToken cancelToken, int rowIndex)
         {
             if (cancelToken.IsCancellationRequested)
             {
                 Console.WriteLine("cancelToken");
-                return;
+                return rowIndex;
             }
             await Task.Run(() =>
             {
                 BoxDetail box = DetailList[rowIndex];
-                if(!String.IsNullOrEmpty(box.CreateTime))
-                {
-                    return;
-                }
                 var request = new RestRequest("dlicense/v2/manu/boxing/queryboxinfo", Method.POST);
                 request.RequestFormat = DataFormat.Json;
                 request.ReadWriteTimeout = 5000;
@@ -307,7 +307,7 @@ namespace PackingTracker.UI
                     }), null);
                 }
             });
-            return;
+            return rowIndex;
         }
 		
 		private void ShowError(string errMsg)
@@ -389,6 +389,14 @@ namespace PackingTracker.UI
         private void refreshButton_Click_1(object sender, EventArgs e)
         {
             boxDataGridView.Invalidate();
+        }
+
+        private void BoxListFrm_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Escape)
+            {
+                this.Close();
+            }
         }
     }
 }

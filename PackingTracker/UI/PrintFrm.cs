@@ -374,7 +374,7 @@ namespace com.newtronics.UI
             BoxCapacityTextBox.Text = string.Format("{0}", BoxDetail.Capacity);
             BoxRealCountTextBox.Text = string.Format("{0}", BoxDetail.RealCount);
             BoxCreateTimeTextBox.Text = BoxDetail.CreateTime;
-            BoxStatusTextBox.Text = BoxDetail.Status;
+            BoxStatusTextBox.Text = BoxDetail.Status;            
         }
 
         void ShowOrderDetail()
@@ -398,6 +398,12 @@ namespace com.newtronics.UI
             VersionTB.Text = OrderDetail.ProductVerTag;
             //固件
             FirmwareTB.Text = OrderDetail.Firmware;
+
+            Custom1TB.Text = OrderDetail.Custom1;
+            Custom2TB.Text = OrderDetail.Custom2;
+            Custom3TB.Text = OrderDetail.Custom3;
+            Custom4TB.Text = OrderDetail.Custom4;
+            Custom5TB.Text = OrderDetail.Custom5;
         }
 
         /// <summary>
@@ -1292,6 +1298,18 @@ namespace com.newtronics.UI
             else
             {
                 MessageBox.Show("必须为数字", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void PrintFrm_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.F12)
+            {
+                PrintLabelButton_Click(null, null);
+            }
+            else if(e.KeyCode == Keys.Escape)
+            {
+                this.Close();
             }
         }
     }

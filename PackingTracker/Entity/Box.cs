@@ -43,6 +43,7 @@ namespace PackingTracker.Entity
             get;
             set;
         }
+        //查询外箱时用
     }
 	
     public class DevInfo
@@ -83,8 +84,6 @@ namespace PackingTracker.Entity
         public int Capacity { get; set; }
 
         public int RealCount { get; set; }
-
-        public CancellationToken Token{get;set;}
     }
 	
 	/// <summary>

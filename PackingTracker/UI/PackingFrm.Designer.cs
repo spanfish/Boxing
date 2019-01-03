@@ -19,7 +19,7 @@ namespace PackingTracker.UI
 		private System.Windows.Forms.Button applyBoxButton;
 		private System.Windows.Forms.Button packingCompButon;
 		private System.Windows.Forms.TextBox deviceInputTextBox;
-		private System.Windows.Forms.Label label2;
+		private System.Windows.Forms.Label prompLabel;
 		private System.Windows.Forms.Button printLabelButon;
 		private System.Windows.Forms.Label label3;
 		private System.Windows.Forms.Label label4;
@@ -54,7 +54,7 @@ namespace PackingTracker.UI
             this.applyBoxButton = new System.Windows.Forms.Button();
             this.packingCompButon = new System.Windows.Forms.Button();
             this.deviceInputTextBox = new System.Windows.Forms.TextBox();
-            this.label2 = new System.Windows.Forms.Label();
+            this.prompLabel = new System.Windows.Forms.Label();
             this.printLabelButon = new System.Windows.Forms.Button();
             this.label3 = new System.Windows.Forms.Label();
             this.label4 = new System.Windows.Forms.Label();
@@ -126,14 +126,14 @@ namespace PackingTracker.UI
             this.deviceInputTextBox.TabIndex = 4;
             this.deviceInputTextBox.KeyDown += new System.Windows.Forms.KeyEventHandler(this.DeviceInputTextBoxKeyDown);
             // 
-            // label2
+            // prompLabel
             // 
-            this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(8, 654);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(91, 12);
-            this.label2.TabIndex = 5;
-            this.label2.Text = "请输入DID/MAC";
+            this.prompLabel.AutoSize = true;
+            this.prompLabel.Location = new System.Drawing.Point(8, 654);
+            this.prompLabel.Name = "prompLabel";
+            this.prompLabel.Size = new System.Drawing.Size(91, 12);
+            this.prompLabel.TabIndex = 5;
+            this.prompLabel.Text = "请输入DID/MAC";
             // 
             // printLabelButon
             // 
@@ -340,16 +340,18 @@ namespace PackingTracker.UI
             this.Controls.Add(this.label4);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.printLabelButon);
-            this.Controls.Add(this.label2);
+            this.Controls.Add(this.prompLabel);
             this.Controls.Add(this.deviceInputTextBox);
             this.Controls.Add(this.packingCompButon);
             this.Controls.Add(this.applyBoxButton);
             this.Controls.Add(this.boxCapacityTextBox);
             this.Controls.Add(this.label1);
+            this.KeyPreview = true;
             this.Name = "PackingFrm";
             this.Text = "装箱";
             this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
             this.Load += new System.EventHandler(this.PackingFrmLoad);
+            this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.PackingFrm_KeyDown);
             ((System.ComponentModel.ISupportInitialize)(this.deviceDataGridView)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();

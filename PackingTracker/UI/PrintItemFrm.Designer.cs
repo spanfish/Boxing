@@ -129,6 +129,7 @@
             this.Custom5TB.Name = "Custom5TB";
             this.Custom5TB.Size = new System.Drawing.Size(136, 19);
             this.Custom5TB.TabIndex = 209;
+            this.Custom5TB.Text = "自定义5:";
             // 
             // textBox22
             // 
@@ -162,6 +163,7 @@
             this.Custom4TB.Name = "Custom4TB";
             this.Custom4TB.Size = new System.Drawing.Size(136, 19);
             this.Custom4TB.TabIndex = 205;
+            this.Custom4TB.Text = "自定义4:";
             // 
             // textBox18
             // 
@@ -195,6 +197,7 @@
             this.Custom3TB.Name = "Custom3TB";
             this.Custom3TB.Size = new System.Drawing.Size(136, 19);
             this.Custom3TB.TabIndex = 201;
+            this.Custom3TB.Text = "自定义3:";
             // 
             // textBox13
             // 
@@ -228,6 +231,7 @@
             this.Custom2TB.Name = "Custom2TB";
             this.Custom2TB.Size = new System.Drawing.Size(136, 19);
             this.Custom2TB.TabIndex = 197;
+            this.Custom2TB.Text = "自定义2:";
             // 
             // textBox9
             // 
@@ -261,6 +265,7 @@
             this.Custom1TB.Name = "Custom1TB";
             this.Custom1TB.Size = new System.Drawing.Size(136, 19);
             this.Custom1TB.TabIndex = 193;
+            this.Custom1TB.Text = "自定义1:";
             // 
             // textBox4
             // 

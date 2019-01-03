@@ -174,11 +174,13 @@ namespace PackingTracker.UI
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1008, 729);
             this.Controls.Add(this.tableLayoutPanel1);
+            this.KeyPreview = true;
             this.Name = "BoxListFrm";
             this.Text = "装箱列表";
             this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.BoxListFrm_FormClosing);
             this.Load += new System.EventHandler(this.BoxListFrmLoad);
+            this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.BoxListFrm_KeyDown);
             this.tableLayoutPanel1.ResumeLayout(false);
             this.tableLayoutPanel2.ResumeLayout(false);
             this.tableLayoutPanel3.ResumeLayout(false);

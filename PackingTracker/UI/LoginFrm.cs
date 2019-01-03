@@ -112,7 +112,7 @@ namespace PackingTracker.UI
             string encryptedPwd = sb.ToString();
             sb = new System.Text.StringBuilder();
             sb.Append("{\"phone\":\"");
-            sb.Append("15372098619");
+            sb.Append(Id);
             sb.Append("\",");
             sb.Append("\"password\":\"");
             sb.Append(encryptedPwd);

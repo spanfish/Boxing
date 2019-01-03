@@ -712,9 +712,9 @@
             this.PrintLabelButton.ForeColor = System.Drawing.Color.White;
             this.PrintLabelButton.Location = new System.Drawing.Point(479, 517);
             this.PrintLabelButton.Name = "PrintLabelButton";
-            this.PrintLabelButton.Size = new System.Drawing.Size(111, 30);
+            this.PrintLabelButton.Size = new System.Drawing.Size(152, 30);
             this.PrintLabelButton.TabIndex = 95;
-            this.PrintLabelButton.Text = "打印";
+            this.PrintLabelButton.Text = "打印 (F12)";
             this.PrintLabelButton.UseVisualStyleBackColor = false;
             this.PrintLabelButton.Click += new System.EventHandler(this.PrintLabelButton_Click);
             // 
@@ -893,10 +893,12 @@
             this.Controls.Add(this.label4);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.label2);
+            this.KeyPreview = true;
             this.Name = "PrintFrm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "打印标签";
             this.Load += new System.EventHandler(this.PrintFrm_Load);
+            this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.PrintFrm_KeyDown);
             ((System.ComponentModel.ISupportInitialize)(this.PreviewLabel)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
