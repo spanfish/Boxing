@@ -17,6 +17,7 @@ namespace com.newtronics.UI
 {
     public partial class PrintFrm : Form
     {
+        #region Local Variables
         private int TopMargin
         {
             get;
@@ -72,11 +73,38 @@ namespace com.newtronics.UI
         private RestClient client;
 
         private readonly SynchronizationContext synchronizationContext;
+        #endregion
 
         public PrintFrm(string boxSN, OrderDetail orderDetail)
         {
             BoxSN = boxSN;
             OrderDetail = orderDetail;
+#if DEBUG
+            //OrderDetail = new OrderDetail();
+            //OrderDetail.OrderId = "B-MK-18082201-2";
+            //OrderDetail.AgreementId = "B-MK-18082201-2";
+            //OrderDetail.ProductModel = "BL5015-HBSG011002";
+            //OrderDetail.ProductName = "ProductName";
+            //OrderDetail.ProductDesc = "Opple_Control_WiFi_MTK7698_3.3V_U. FL接口外置天线_stamp_PC BA_V1.1_new模块(欧普WIFI控制盒去谐波205100010281)";
+            //OrderDetail.Workform = "20181105162108-221-1";
+            //OrderDetail.FactoryName = "12345678901234560";
+            //OrderDetail.MaterialCode = "12345678901234560";
+            //OrderDetail.KehuCode = "12345678901234560";
+            //OrderDetail.Supplier = "杭州古北电子科技有限公司";
+            //OrderDetail.ProductVerTag = "12345678901234560";
+            //OrderDetail.BatchNo = "12345678901234560";
+            //OrderDetail.FactoryName = "12345678901234560";
+
+            //BoxSN = "IBC20181208000013";
+
+            //BoxDetail = new BoxDetail();
+            //BoxDetail.Oemfactoryid = "12345678901234560";
+            //BoxDetail.RealCount = 1000;
+            //BoxDetail.OrderId = "12345678901234560";
+            //BoxDetail.BoxSN = "IBC20181208000013";
+            //BoxDetail.BoxType = "Inner";
+            
+#endif
             synchronizationContext = SynchronizationContext.Current;
 
             InitializeComponent();
@@ -106,16 +134,6 @@ namespace com.newtronics.UI
             PreviewLabel.Image = ImageToConvert;
         }
 
-        private void InitializeCustomItems()
-        {
-            Custom1Label.Text = "自定义1";
-            Custom2Label.Text = "自定义2";
-            Custom3Label.Text = "自定义3";
-            Custom4Label.Text = "自定义4";
-            Custom5Label.Text = "自定义5";
-
-
-        }
         void InitializeFonts()
         {
             InstalledFontCollection fonts = new InstalledFontCollection();
@@ -210,6 +228,13 @@ namespace com.newtronics.UI
 
         private void PrintFrm_Load(object sender, EventArgs e)
         {
+#if DEBUG
+            //ShowBoxDetail();
+            //ShowOrderDetail();
+            //ShowLabel();
+#else
+            
+#endif
             SearchBox();
         }
 
@@ -254,8 +279,96 @@ namespace com.newtronics.UI
             });
         }
 
+        /// <summary>
+        /// 读取打印默认值，已订单为单位
+        /// </summary>
+        /// <param name="Id"></param>
+        /// <param name="Name"></param>
+        /// <returns></returns>
+        private string GetDef(string Id, string Name)
+        {
+            string def = "";
+            using (var conn = DBHelper.Instance.Open())
+            {
+                if (conn != null)
+                {
+                    using (SQLiteCommand command = conn.CreateCommand())
+                    {
+                        command.CommandText = "SELECT DefValue FROM Setting WHERE Id = @Id AND Name=@Name";
+                        command.Parameters.Add("@Id", DbType.String);
+                        command.Parameters.Add("@Name", DbType.String);
+
+                        command.Parameters["@Id"].Value = Id;
+                        command.Parameters["@Name"].Value = Name;
+
+                        string v = command.ExecuteScalar() as string;
+                        if (v != null)
+                        {
+                            def = v;
+                        }
+                    }
+                }
+            }
+            return def;
+        }
+
         void ShowBoxDetail()
         {
+            if (String.IsNullOrEmpty(OrderDetail.Workform))
+            {
+                OrderDetail.Workform = GetDef(OrderDetail.OrderId, "Workform");
+            }
+
+            if (String.IsNullOrEmpty(OrderDetail.MaterialCode))
+            {
+                OrderDetail.MaterialCode = GetDef(OrderDetail.OrderId, "GuBeiNo");
+            }
+
+            if (String.IsNullOrEmpty(OrderDetail.KehuCode))
+            {
+                OrderDetail.KehuCode = GetDef(OrderDetail.OrderId, "KehuNo");
+            }
+
+            if (String.IsNullOrEmpty(OrderDetail.ProductModel))
+            {
+                OrderDetail.ProductModel = GetDef(OrderDetail.OrderId, "ProdModel");
+            }
+
+            if (String.IsNullOrEmpty(OrderDetail.ProductDesc))
+            {
+                OrderDetail.ProductDesc = GetDef(OrderDetail.OrderId, "ProdDesc");
+            }
+
+            if (String.IsNullOrEmpty(OrderDetail.Supplier))
+            {
+                OrderDetail.Supplier = GetDef(OrderDetail.OrderId, "Supplier");
+            }
+
+            if (String.IsNullOrEmpty(OrderDetail.Supplier))
+            {
+                OrderDetail.Supplier = "杭州古北电子科技有限公司";
+            }
+
+            if (String.IsNullOrEmpty(OrderDetail.BatchNo))
+            {
+                OrderDetail.BatchNo = GetDef(OrderDetail.OrderId, "BatchNo");
+            }
+
+            if (String.IsNullOrEmpty(OrderDetail.ProductVerTag))
+            {
+                OrderDetail.ProductVerTag = GetDef(OrderDetail.OrderId, "Version");
+            }
+
+            if (String.IsNullOrEmpty(OrderDetail.Firmware))
+            {
+                OrderDetail.Firmware = GetDef(OrderDetail.OrderId, "Firmware");
+            }
+            OrderDetail.Custom1 = GetDef(OrderDetail.OrderId, "Custom1");
+            OrderDetail.Custom2 = GetDef(OrderDetail.OrderId, "Custom2");
+            OrderDetail.Custom3 = GetDef(OrderDetail.OrderId, "Custom3");
+            OrderDetail.Custom4 = GetDef(OrderDetail.OrderId, "Custom4");
+            OrderDetail.Custom5 = GetDef(OrderDetail.OrderId, "Custom5");
+
             BoxTypeTextBox.Text = BoxDetail.BoxType;
             BoxSNTextBox.Text = BoxDetail.BoxSN;
             BoxCapacityTextBox.Text = string.Format("{0}", BoxDetail.Capacity);
@@ -287,9 +400,16 @@ namespace com.newtronics.UI
             FirmwareTB.Text = OrderDetail.Firmware;
         }
 
+        /// <summary>
+        /// 显示标签
+        /// </summary>
         void ShowLabel()
         {
-            #region 字体设置
+            if(ImageToConvert == null)
+            {
+                return;
+            }
+#region 字体间距等设置
             if (!String.IsNullOrEmpty(LineSpaceTB.Text))
             {
                 LineSpace = Int32.Parse(LineSpaceTB.Text);
@@ -404,9 +524,9 @@ namespace com.newtronics.UI
             fieldFormat.LineAlignment = StringAlignment.Near;
 
             SolidBrush textBrush = new SolidBrush(Color.Black);
-            #endregion
+#endregion
 
-            #region 取得标签项目
+#region 取得标签项目
             List<string> items = GetPrintItems(OrderDetail.OrderId);
             if (items == null || items.Count == 0)
             {
@@ -425,7 +545,7 @@ namespace com.newtronics.UI
                 MessageBox.Show("无打印项目", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
-            #endregion
+#endregion
 
             Graphics g = Graphics.FromImage(ImageToConvert);
 
@@ -435,15 +555,15 @@ namespace com.newtronics.UI
             int top = TopMargin;
             int left = LeftMargin;
 
-            #region 打印标题
+#region 打印标题-产品装箱单
             string title = "产品装箱单";
             g.DrawString(title, headFont, textBrush, new RectangleF(left, top, WidthInPixel, HeightInPixel), headFormat);
             Size tmpSize = TextRenderer.MeasureText(g, title, headFont);
             top += tmpSize.Height;
             top += LineSpace;
-            #endregion
+#endregion
 
-            #region 打印项目
+#region 打印项目
             foreach (string pr in items)
             {
                 string[] tmpArr = pr.Split('\t');
@@ -473,7 +593,7 @@ namespace com.newtronics.UI
                     //古北产品编码
                     Text = OrderDetail.MaterialCode;
                 }
-                else if (Name == "CustomerNo")
+                else if (name == "CustomerNo")
                 {
                     //客户产品编码
                     Text = OrderDetail.KehuCode;
@@ -548,6 +668,10 @@ namespace com.newtronics.UI
                     //Custom
                     Text = OrderDetail.Custom5;
                 }
+                else
+                {
+                    throw new NotImplementedException("");
+                }
 
                 g.DrawString(disp, titleFont, textBrush, new RectangleF(left, top, WidthInPixel, HeightInPixel), titleFormat);
                 tmpSize = TextRenderer.MeasureText(g, disp, titleFont);
@@ -595,7 +719,7 @@ namespace com.newtronics.UI
 
                 top += LineSpace;
             }
-            #endregion
+#endregion
 
             PreviewLabel.Image = ImageToConvert;
         }
@@ -654,7 +778,7 @@ namespace com.newtronics.UI
             LPPrint printer = null;
             try
             {
-                string zplCmd = com.newtronics.Common.Convert.BitmapToZPLII(new Bitmap(799,559), 0, 0);
+                string zplCmd = Image2ZPL.Convert.BitmapToZPLII(ImageToConvert, 0, 0);
 
                 StringBuilder sb = new StringBuilder();
                 sb.Append("^XA^LH0,0~SD20^PR3,3,3^XZ");
@@ -685,9 +809,9 @@ namespace com.newtronics.UI
                     MessageBox.Show("无法连接打印机", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
-            catch
+            catch(Exception ex)
             {
-                MessageBox.Show("打印错误", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("打印错误:" + ex.Message, "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             finally
             {
@@ -695,6 +819,479 @@ namespace com.newtronics.UI
                 {
                     printer.Close();
                 }
+            }
+        }
+
+        private void TestBtn_Click(object sender, EventArgs e)
+        {
+            ShowLabel();
+        }
+
+        void SaveDefValue(string name, string value)
+        {
+            using (var conn = DBHelper.Instance.Open())
+            {
+                if (conn != null)
+                {
+                    using (SQLiteCommand command = conn.CreateCommand())
+                    {
+                        command.CommandText = "UPDATE Setting SET DefValue = @DefValue WHERE Id = @Id AND Name=@Name";
+                        command.Parameters.Add("@DefValue", DbType.String);
+                        command.Parameters.Add("@ID", DbType.String);
+                        command.Parameters.Add("@Name", DbType.String);
+
+                        command.Parameters["@ID"].Value = OrderDetail.OrderId;
+                        command.Parameters["@Name"].Value = name;
+                        command.Parameters["@DefValue"].Value = value;
+                        if (command.ExecuteNonQuery() == 0)
+                        {
+                            using (SQLiteCommand insCmd = conn.CreateCommand())
+                            {
+                                insCmd.CommandText = "INSERT INTO Setting(Id, Name, DefValue) VALUES(@Id, @Name, @DefValue)";
+
+                                insCmd.Parameters.Add("@DefValue", DbType.String);
+                                insCmd.Parameters.Add("@Name", DbType.String);
+                                insCmd.Parameters.Add("@ID", DbType.String);
+
+                                insCmd.Parameters["@ID"].Value = OrderDetail.OrderId;
+                                insCmd.Parameters["@Name"].Value = name;
+                                insCmd.Parameters["@DefValue"].Value = value;
+                                insCmd.ExecuteNonQuery();
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        private void WorkformTB_Leave(object sender, EventArgs e)
+        {
+            TextBox tb = sender as TextBox;
+            if(!String.Equals(OrderDetail.Workform, tb.Text))
+            {
+                OrderDetail.Workform = tb.Text;
+                SaveDefValue("Workform", tb.Text);
+                ShowLabel();
+            }            
+        }
+
+        private void GubeiNoTB_Leave(object sender, EventArgs e)
+        {
+            TextBox tb = sender as TextBox;
+
+            if (!String.Equals(OrderDetail.MaterialCode, tb.Text))
+            {
+                OrderDetail.MaterialCode = tb.Text;
+                SaveDefValue("GuBeiNo", tb.Text);
+                ShowLabel();
+            }
+        }
+
+        private void KehuNoTB_Leave(object sender, EventArgs e)
+        {
+            TextBox tb = sender as TextBox;
+            if (!String.Equals(OrderDetail.KehuCode, tb.Text))
+            {
+                OrderDetail.KehuCode = tb.Text;
+                SaveDefValue("KehuNo", tb.Text);
+                ShowLabel();
+            }
+        }
+
+        private void ProdModelTB_Leave(object sender, EventArgs e)
+        {
+            TextBox tb = sender as TextBox;
+
+            if (!String.Equals(OrderDetail.ProductModel, tb.Text))
+            {
+                OrderDetail.ProductModel = tb.Text;
+                SaveDefValue("ProdModel", tb.Text);
+                ShowLabel();
+            }
+        }
+
+        private void ProductDescTB_Leave(object sender, EventArgs e)
+        {
+            TextBox tb = sender as TextBox;
+
+            if (!String.Equals(OrderDetail.ProductDesc, tb.Text))
+            {
+                OrderDetail.ProductDesc = tb.Text;
+                SaveDefValue("ProdDesc", tb.Text);
+                ShowLabel();
+            }
+        }
+
+        private void SupplierTB_Leave(object sender, EventArgs e)
+        {
+            TextBox tb = sender as TextBox;
+
+            if (!String.Equals(OrderDetail.Supplier, tb.Text))
+            {
+                OrderDetail.Supplier = tb.Text;
+                SaveDefValue("Supplier", tb.Text);
+                ShowLabel();
+            }
+        }
+
+        private void BatchTB_Leave(object sender, EventArgs e)
+        {
+            TextBox tb = sender as TextBox;
+
+            if (!String.Equals(OrderDetail.BatchNo, tb.Text))
+            {
+                OrderDetail.BatchNo = tb.Text;
+                SaveDefValue("BatchNo", tb.Text);
+                ShowLabel();
+            }
+        }
+
+        private void VersionTB_Leave(object sender, EventArgs e)
+        {
+            TextBox tb = sender as TextBox;
+
+            if (!String.Equals(OrderDetail.ProductVerTag, tb.Text))
+            {
+                OrderDetail.ProductVerTag = tb.Text;
+                SaveDefValue("Version", tb.Text);
+                ShowLabel();
+            }
+        }
+
+        private void FirmwareTB_Leave(object sender, EventArgs e)
+        {
+            TextBox tb = sender as TextBox;
+
+            if (!String.Equals(OrderDetail.Firmware, tb.Text))
+            {
+                OrderDetail.Firmware = tb.Text;
+                SaveDefValue("Firmware", tb.Text);
+                ShowLabel();
+            }
+        }
+
+        private void Custom1TB_Leave(object sender, EventArgs e)
+        {
+            TextBox tb = sender as TextBox;
+
+            if (!String.Equals(OrderDetail.Custom1, tb.Text))
+            {
+                OrderDetail.Custom1 = tb.Text;
+                SaveDefValue("Custom1", tb.Text);
+                ShowLabel();
+            }
+        }
+
+        private void Custom2TB_Leave(object sender, EventArgs e)
+        {
+            TextBox tb = sender as TextBox;
+
+            if (!String.Equals(OrderDetail.Custom2, tb.Text))
+            {
+                OrderDetail.Custom2 = tb.Text;
+                SaveDefValue("Custom2", tb.Text);
+                ShowLabel();
+            }
+        }
+
+        private void Custom3TB_Leave(object sender, EventArgs e)
+        {
+            TextBox tb = sender as TextBox;
+
+            if (!String.Equals(OrderDetail.Custom3, tb.Text))
+            {
+                OrderDetail.Custom3 = tb.Text;
+                SaveDefValue("Custom3", tb.Text);
+                ShowLabel();
+            }
+        }
+
+        private void Custom4TB_Leave(object sender, EventArgs e)
+        {
+            TextBox tb = sender as TextBox;
+
+            if (!String.Equals(OrderDetail.Custom4, tb.Text))
+            {
+                OrderDetail.Custom4 = tb.Text;
+                SaveDefValue("Custom4", tb.Text);
+                ShowLabel();
+            }
+        }
+
+        private void Custom5TB_Leave(object sender, EventArgs e)
+        {
+            TextBox tb = sender as TextBox;
+
+            if (!String.Equals(OrderDetail.Custom5, tb.Text))
+            {
+                OrderDetail.Custom5 = tb.Text;
+                SaveDefValue("Custom5", tb.Text);
+                ShowLabel();
+            }
+        }
+
+        private void SelectPrintItemButton_Click(object sender, EventArgs e)
+        {
+            if (OrderDetail == null || String.IsNullOrEmpty(OrderDetail.OrderId))
+            {
+                MessageBox.Show("无订单，请先检索箱子", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+            PrintItemFrm frm = new PrintItemFrm();
+            frm.OrderID = OrderDetail.OrderId;
+            if (frm.ShowDialog() == DialogResult.OK)
+            {
+                InitializeCustomItems();
+                ShowLabel();
+            }            
+        }
+
+        private void InitializeCustomItems()
+        {
+            Custom1Label.Text = "自定义1";
+            Custom2Label.Text = "自定义2";
+            Custom3Label.Text = "自定义3";
+            Custom4Label.Text = "自定义4";
+            Custom5Label.Text = "自定义5";
+
+            using (var conn = DBHelper.Instance.Open())
+            {
+                if (conn != null)
+                {
+                    using (SQLiteCommand command = conn.CreateCommand())
+                    {
+                        command.CommandText = "SELECT Name, DispText FROM Print WHERE Id = @Id AND Name like 'Custom%' and DispSeq > 0";
+                        command.Parameters.Add("@Id", DbType.String);
+                        command.Parameters.Add("@Name", DbType.String);
+                        command.Parameters["@Id"].Value = OrderDetail.OrderId;
+
+                        using (SQLiteDataReader dr = command.ExecuteReader())
+                        {
+                            while (dr != null && dr.Read())
+                            {
+                                string name = dr.GetString(0);
+                                string dispText = dr.GetString(1);
+                                //string defValue = dr.GetString(1);
+                                if (name == "Custom1")
+                                {
+                                    if (!String.IsNullOrEmpty(dispText))
+                                    {
+                                        Custom1Label.Text = dispText;
+                                    }
+                                }
+                                else if (name == "Custom2")
+                                {
+                                    if (!String.IsNullOrEmpty(dispText))
+                                    {
+                                        Custom2Label.Text = dispText;
+                                    }
+                                }
+                                else if (name == "Custom3")
+                                {
+                                    if (!String.IsNullOrEmpty(dispText))
+                                    {
+                                        Custom3Label.Text = dispText;
+                                    }
+                                }
+                                else if (name == "Custom4")
+                                {
+                                    if (!String.IsNullOrEmpty(dispText))
+                                    {
+                                        Custom4Label.Text = dispText;
+                                    }
+                                }
+                                else if (name == "Custom5")
+                                {
+                                    if (!String.IsNullOrEmpty(dispText))
+                                    {
+                                        Custom5Label.Text = dispText;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        private void HeadFontList_SelectedValueChanged(object sender, EventArgs e)
+        {
+            ShowLabel();
+        }
+
+        
+
+        private void HeadFontList_SelectedValueChanged_1(object sender, EventArgs e)
+        {
+            string HeadFontName = (sender as ComboBox).SelectedItem as string;
+            string def = Properties.Settings.Default["HeadFontName"] as string;
+            if (!String.IsNullOrEmpty(HeadFontName) && !String.Equals(def, HeadFontName))
+            {
+                Properties.Settings.Default["HeadFontName"] = HeadFontName;
+                Properties.Settings.Default.Save();
+                ShowLabel();
+            }
+        }
+
+        private void HeadFontSizeList_SelectedValueChanged(object sender, EventArgs e)
+        {
+            string HeadFontSize = (sender as ComboBox).SelectedItem as string;
+            string def = Properties.Settings.Default["HeadFontSize"] as string;
+            if (!String.IsNullOrEmpty(HeadFontSize) && !String.Equals(def, HeadFontSize))
+            {
+                Properties.Settings.Default["HeadFontSize"] = HeadFontSize;
+                Properties.Settings.Default.Save();
+                ShowLabel();
+            }
+        }
+
+        private void HeadFontTypeList_SelectedValueChanged(object sender, EventArgs e)
+        {
+            string HeadFonStyle = (sender as ComboBox).SelectedItem as string;
+            string def = Properties.Settings.Default["HeadFontStyle"] as string;
+
+            if (!String.IsNullOrEmpty(HeadFonStyle) && !String.Equals(def, HeadFonStyle))
+            {
+                Properties.Settings.Default["HeadFontStyle"] = HeadFonStyle;
+                Properties.Settings.Default.Save();
+                ShowLabel();
+            }
+        }
+
+        private void TitleFontList_SelectedValueChanged(object sender, EventArgs e)
+        {
+            string TitleFontName = (sender as ComboBox).SelectedItem as string;
+            string def = Properties.Settings.Default["TitleFontName"] as string;
+
+            if (!String.IsNullOrEmpty(TitleFontName) && !String.Equals(def, TitleFontName))
+            {
+                Properties.Settings.Default["TitleFontName"] = TitleFontName;
+                Properties.Settings.Default.Save();
+                ShowLabel();
+            }
+        }
+
+        private void TitleFontSizeList_SelectedValueChanged(object sender, EventArgs e)
+        {
+            string TitleFontSize = (sender as ComboBox).SelectedItem as string;
+            string def = Properties.Settings.Default["TitleFontSize"] as string;
+
+            if (!String.IsNullOrEmpty(TitleFontSize) && !String.Equals(def, TitleFontSize))
+            {
+                Properties.Settings.Default["TitleFontSize"] = TitleFontSize;
+                Properties.Settings.Default.Save();
+                ShowLabel();
+            }
+        }
+
+        private void TitleFontTypeList_SelectedValueChanged(object sender, EventArgs e)
+        {
+            string TitleFontStyle = (sender as ComboBox).SelectedItem as string;
+            string def = Properties.Settings.Default["TitleFontStyle"] as string;
+            if (!String.IsNullOrEmpty(TitleFontStyle) && !String.Equals(def, TitleFontStyle))
+            {
+                Properties.Settings.Default["TitleFontStyle"] = TitleFontStyle;
+                Properties.Settings.Default.Save();
+                ShowLabel();
+            }
+        }
+
+        private void FieldFontList_SelectedValueChanged(object sender, EventArgs e)
+        {
+            string FieldFontName = (sender as ComboBox).SelectedItem as string;
+            string def = Properties.Settings.Default["FieldFontName"] as string;
+
+            if (!String.IsNullOrEmpty(FieldFontName) && !String.Equals(def, FieldFontName))
+            {
+                Properties.Settings.Default["FieldFontName"] = FieldFontName;
+                Properties.Settings.Default.Save();
+                ShowLabel();
+            }
+        }
+
+        private void FieldFontSizeList_SelectedValueChanged(object sender, EventArgs e)
+        {
+            string TitleFontSize = (sender as ComboBox).SelectedItem as string;
+            string def = Properties.Settings.Default["TitleFontSize"] as string;
+
+            if (!String.IsNullOrEmpty(TitleFontSize) && !String.Equals(def, TitleFontSize))
+            {
+                Properties.Settings.Default["TitleFontSize"] = TitleFontSize;
+                Properties.Settings.Default.Save();
+                ShowLabel();
+            }
+        }
+
+        private void FieldFontTypeList_SelectedValueChanged(object sender, EventArgs e)
+        {
+            string TitleFontStyle = (sender as ComboBox).SelectedItem as string;
+            string def = Properties.Settings.Default["TitleFontStyle"] as string;
+
+            if (!String.IsNullOrEmpty(TitleFontStyle) && !String.Equals(def, TitleFontStyle))
+            {
+                Properties.Settings.Default["TitleFontStyle"] = TitleFontStyle;
+                Properties.Settings.Default.Save();
+                ShowLabel();
+            }
+        }
+
+        private void LineSpaceTB_Leave(object sender, EventArgs e)
+        {
+            string v = (sender as TextBox).Text;
+            int Result;
+            if (Int32.TryParse(v, out Result))
+            {
+                string def = Properties.Settings.Default["LineSpace"] as string;
+                if(!String.Equals(def, v))
+                {
+                    Properties.Settings.Default["LineSpace"] = v;
+                    Properties.Settings.Default.Save();
+                    ShowLabel();
+                }                
+            }
+            else
+            {
+                MessageBox.Show("必须为数字", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void LeftMarginTB_Leave(object sender, EventArgs e)
+        {
+            string v = (sender as TextBox).Text;
+            int Result;
+            if (Int32.TryParse(v, out Result))
+            {
+                string def = Properties.Settings.Default["LeftMargin"] as string;
+                if (!String.Equals(def, v))
+                {
+                    Properties.Settings.Default["LeftMargin"] = v;
+                    Properties.Settings.Default.Save();
+                    ShowLabel();
+                }                    
+            }
+            else
+            {
+                MessageBox.Show("必须为数字", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void TopMarginTB_Leave(object sender, EventArgs e)
+        {
+            string v = (sender as TextBox).Text;
+            int Result;
+            if (Int32.TryParse(v, out Result))
+            {
+                string def = Properties.Settings.Default["TopMargin"] as string;
+                if (!String.Equals(def, v))
+                {
+                    Properties.Settings.Default["TopMargin"] = v;
+                    Properties.Settings.Default.Save();
+                    ShowLabel();
+                }                    
+            }
+            else
+            {
+                MessageBox.Show("必须为数字", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
     }

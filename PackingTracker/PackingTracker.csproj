@@ -8,7 +8,7 @@
     <OutputType>WinExe</OutputType>
     <RootNamespace>com.newtronics</RootNamespace>
     <AssemblyName>BoxTool</AssemblyName>
-    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.7.1</TargetFrameworkVersion>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <TargetFrameworkProfile />
     <NoWin32Manifest>False</NoWin32Manifest>
@@ -94,11 +94,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Common\Constants.cs" />
-    <Compile Include="Common\Convert.cs" />
     <Compile Include="Common\DBHelper.cs" />
     <Compile Include="Common\LPPrint.cs" />
     <Compile Include="Common\SharedApp.cs" />
-    <Compile Include="Common\ZPLII.cs" />
     <Compile Include="Entity\Account.cs" />
     <Compile Include="Entity\AddDevBinding.cs" />
     <Compile Include="Entity\Box.cs" />
@@ -157,7 +155,12 @@
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\..\PackingTracker\Image-2-ZPL\Image2ZPL\Image2ZPL.csproj">
+      <Project>{4e23a029-19a9-4618-b244-0a697824e6c6}</Project>
+      <Name>Image2ZPL</Name>
+    </ProjectReference>
+  </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="UI\BoxListFrm.resx">
       <DependentUpon>BoxListFrm.cs</DependentUpon>

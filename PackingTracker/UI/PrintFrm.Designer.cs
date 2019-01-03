@@ -105,6 +105,7 @@
             this.Custom5TB.Name = "Custom5TB";
             this.Custom5TB.Size = new System.Drawing.Size(375, 19);
             this.Custom5TB.TabIndex = 151;
+            this.Custom5TB.Leave += new System.EventHandler(this.Custom5TB_Leave);
             // 
             // Custom5Label
             // 
@@ -121,6 +122,7 @@
             this.Custom4TB.Name = "Custom4TB";
             this.Custom4TB.Size = new System.Drawing.Size(375, 19);
             this.Custom4TB.TabIndex = 149;
+            this.Custom4TB.Leave += new System.EventHandler(this.Custom4TB_Leave);
             // 
             // Custom4Label
             // 
@@ -137,6 +139,7 @@
             this.Custom3TB.Name = "Custom3TB";
             this.Custom3TB.Size = new System.Drawing.Size(375, 19);
             this.Custom3TB.TabIndex = 147;
+            this.Custom3TB.Leave += new System.EventHandler(this.Custom3TB_Leave);
             // 
             // Custom3Label
             // 
@@ -153,6 +156,7 @@
             this.Custom2TB.Name = "Custom2TB";
             this.Custom2TB.Size = new System.Drawing.Size(375, 19);
             this.Custom2TB.TabIndex = 145;
+            this.Custom2TB.Leave += new System.EventHandler(this.Custom2TB_Leave);
             // 
             // Custom2Label
             // 
@@ -169,6 +173,7 @@
             this.Custom1TB.Name = "Custom1TB";
             this.Custom1TB.Size = new System.Drawing.Size(375, 19);
             this.Custom1TB.TabIndex = 143;
+            this.Custom1TB.Leave += new System.EventHandler(this.Custom1TB_Leave);
             // 
             // Custom1Label
             // 
@@ -194,6 +199,7 @@
             this.FirmwareTB.Name = "FirmwareTB";
             this.FirmwareTB.Size = new System.Drawing.Size(375, 19);
             this.FirmwareTB.TabIndex = 140;
+            this.FirmwareTB.Leave += new System.EventHandler(this.FirmwareTB_Leave);
             // 
             // label18
             // 
@@ -210,6 +216,7 @@
             this.TopMarginTB.Name = "TopMarginTB";
             this.TopMarginTB.Size = new System.Drawing.Size(49, 19);
             this.TopMarginTB.TabIndex = 138;
+            this.TopMarginTB.Leave += new System.EventHandler(this.TopMarginTB_Leave);
             // 
             // label17
             // 
@@ -265,6 +272,7 @@
             this.LeftMarginTB.Name = "LeftMarginTB";
             this.LeftMarginTB.Size = new System.Drawing.Size(39, 19);
             this.LeftMarginTB.TabIndex = 132;
+            this.LeftMarginTB.Leave += new System.EventHandler(this.LeftMarginTB_Leave);
             // 
             // VersionTB
             // 
@@ -272,6 +280,7 @@
             this.VersionTB.Name = "VersionTB";
             this.VersionTB.Size = new System.Drawing.Size(375, 19);
             this.VersionTB.TabIndex = 131;
+            this.VersionTB.Leave += new System.EventHandler(this.VersionTB_Leave);
             // 
             // label26
             // 
@@ -288,6 +297,7 @@
             this.BatchTB.Name = "BatchTB";
             this.BatchTB.Size = new System.Drawing.Size(375, 19);
             this.BatchTB.TabIndex = 129;
+            this.BatchTB.Leave += new System.EventHandler(this.BatchTB_Leave);
             // 
             // label25
             // 
@@ -306,6 +316,7 @@
             this.SelectPrintItemButton.TabIndex = 127;
             this.SelectPrintItemButton.Text = "设定打印项目";
             this.SelectPrintItemButton.UseVisualStyleBackColor = true;
+            this.SelectPrintItemButton.Click += new System.EventHandler(this.SelectPrintItemButton_Click);
             // 
             // LineSpaceTB
             // 
@@ -313,6 +324,7 @@
             this.LineSpaceTB.Name = "LineSpaceTB";
             this.LineSpaceTB.Size = new System.Drawing.Size(67, 19);
             this.LineSpaceTB.TabIndex = 126;
+            this.LineSpaceTB.Leave += new System.EventHandler(this.LineSpaceTB_Leave);
             // 
             // label24
             // 
@@ -345,6 +357,7 @@
             this.FieldFontTypeList.Name = "FieldFontTypeList";
             this.FieldFontTypeList.Size = new System.Drawing.Size(121, 20);
             this.FieldFontTypeList.TabIndex = 123;
+            this.FieldFontTypeList.SelectedValueChanged += new System.EventHandler(this.FieldFontTypeList_SelectedValueChanged);
             // 
             // TitleFontTypeList
             // 
@@ -357,6 +370,7 @@
             this.TitleFontTypeList.Name = "TitleFontTypeList";
             this.TitleFontTypeList.Size = new System.Drawing.Size(121, 20);
             this.TitleFontTypeList.TabIndex = 122;
+            this.TitleFontTypeList.SelectedValueChanged += new System.EventHandler(this.TitleFontTypeList_SelectedValueChanged);
             // 
             // HeadFontTypeList
             // 
@@ -369,6 +383,7 @@
             this.HeadFontTypeList.Name = "HeadFontTypeList";
             this.HeadFontTypeList.Size = new System.Drawing.Size(121, 20);
             this.HeadFontTypeList.TabIndex = 121;
+            this.HeadFontTypeList.SelectedValueChanged += new System.EventHandler(this.HeadFontTypeList_SelectedValueChanged);
             // 
             // FieldFontSizeList
             // 
@@ -413,6 +428,7 @@
             this.FieldFontSizeList.Name = "FieldFontSizeList";
             this.FieldFontSizeList.Size = new System.Drawing.Size(121, 20);
             this.FieldFontSizeList.TabIndex = 120;
+            this.FieldFontSizeList.SelectedValueChanged += new System.EventHandler(this.FieldFontSizeList_SelectedValueChanged);
             // 
             // FieldFontList
             // 
@@ -421,6 +437,7 @@
             this.FieldFontList.Name = "FieldFontList";
             this.FieldFontList.Size = new System.Drawing.Size(121, 20);
             this.FieldFontList.TabIndex = 119;
+            this.FieldFontList.SelectedValueChanged += new System.EventHandler(this.FieldFontList_SelectedValueChanged);
             // 
             // TitleFontSizeList
             // 
@@ -465,6 +482,7 @@
             this.TitleFontSizeList.Name = "TitleFontSizeList";
             this.TitleFontSizeList.Size = new System.Drawing.Size(121, 20);
             this.TitleFontSizeList.TabIndex = 118;
+            this.TitleFontSizeList.SelectedValueChanged += new System.EventHandler(this.TitleFontSizeList_SelectedValueChanged);
             // 
             // TitleFontList
             // 
@@ -473,6 +491,7 @@
             this.TitleFontList.Name = "TitleFontList";
             this.TitleFontList.Size = new System.Drawing.Size(121, 20);
             this.TitleFontList.TabIndex = 117;
+            this.TitleFontList.SelectedValueChanged += new System.EventHandler(this.TitleFontList_SelectedValueChanged);
             // 
             // label16
             // 
@@ -537,6 +556,7 @@
             this.HeadFontSizeList.Name = "HeadFontSizeList";
             this.HeadFontSizeList.Size = new System.Drawing.Size(121, 20);
             this.HeadFontSizeList.TabIndex = 114;
+            this.HeadFontSizeList.SelectedValueChanged += new System.EventHandler(this.HeadFontSizeList_SelectedValueChanged);
             // 
             // HeadFontList
             // 
@@ -545,6 +565,7 @@
             this.HeadFontList.Name = "HeadFontList";
             this.HeadFontList.Size = new System.Drawing.Size(121, 20);
             this.HeadFontList.TabIndex = 113;
+            this.HeadFontList.SelectedValueChanged += new System.EventHandler(this.HeadFontList_SelectedValueChanged_1);
             // 
             // SupplierTB
             // 
@@ -552,6 +573,7 @@
             this.SupplierTB.Name = "SupplierTB";
             this.SupplierTB.Size = new System.Drawing.Size(375, 19);
             this.SupplierTB.TabIndex = 111;
+            this.SupplierTB.Leave += new System.EventHandler(this.SupplierTB_Leave);
             // 
             // label13
             // 
@@ -568,6 +590,7 @@
             this.ProductDescTB.Name = "ProductDescTB";
             this.ProductDescTB.Size = new System.Drawing.Size(375, 19);
             this.ProductDescTB.TabIndex = 109;
+            this.ProductDescTB.Leave += new System.EventHandler(this.ProductDescTB_Leave);
             // 
             // label15
             // 
@@ -584,6 +607,7 @@
             this.ProdModelTB.Name = "ProdModelTB";
             this.ProdModelTB.Size = new System.Drawing.Size(375, 19);
             this.ProdModelTB.TabIndex = 107;
+            this.ProdModelTB.Leave += new System.EventHandler(this.ProdModelTB_Leave);
             // 
             // label10
             // 
@@ -600,6 +624,7 @@
             this.KehuNoTB.Name = "KehuNoTB";
             this.KehuNoTB.Size = new System.Drawing.Size(375, 19);
             this.KehuNoTB.TabIndex = 105;
+            this.KehuNoTB.Leave += new System.EventHandler(this.KehuNoTB_Leave);
             // 
             // label11
             // 
@@ -616,6 +641,7 @@
             this.GubeiNoTB.Name = "GubeiNoTB";
             this.GubeiNoTB.Size = new System.Drawing.Size(375, 19);
             this.GubeiNoTB.TabIndex = 103;
+            this.GubeiNoTB.Leave += new System.EventHandler(this.GubeiNoTB_Leave);
             // 
             // label12
             // 
@@ -632,6 +658,7 @@
             this.WorkformTB.Name = "WorkformTB";
             this.WorkformTB.Size = new System.Drawing.Size(375, 19);
             this.WorkformTB.TabIndex = 101;
+            this.WorkformTB.Leave += new System.EventHandler(this.WorkformTB_Leave);
             // 
             // label9
             // 
@@ -667,6 +694,7 @@
             this.TestBtn.TabIndex = 97;
             this.TestBtn.Text = "测试";
             this.TestBtn.UseVisualStyleBackColor = true;
+            this.TestBtn.Click += new System.EventHandler(this.TestBtn_Click);
             // 
             // PreviewLabel
             // 

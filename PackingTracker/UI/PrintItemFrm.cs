@@ -359,6 +359,7 @@ namespace com.newtronics.UI
 
         private void PrintItemFrm_Load(object sender, EventArgs e)
         {
+            OrderIdTB.Text = OrderID;
             LoadPrintItems();
         }
 
