@@ -43,7 +43,21 @@ namespace PackingTracker.Entity
             get;
             set;
         }
+
         //查询外箱时用
+        /// <summary>
+        /// 内箱SN
+        /// </summary>
+        public List<string> BoxSN
+        {
+            get;
+            set;
+        }
+        public List<BoxDetail> InnerBoxes
+        {
+            get;
+            set;
+        }
     }
 	
     public class DevInfo

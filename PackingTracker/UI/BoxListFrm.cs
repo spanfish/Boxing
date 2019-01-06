@@ -52,10 +52,10 @@ namespace PackingTracker.UI
 			this.OrderDetail = orderDetail;
 			this.Text = "装箱列表[订单:" + orderDetail.OrderId + "]";
 			this.boxDataGridView.AutoGenerateColumns = false;
-            this.boxDataGridView.VirtualMode = true;
+            //this.boxDataGridView.VirtualMode = true;
             this.boxDataGridView.ReadOnly = true;
 			this.boxDataGridView.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-            this.boxDataGridView.CellValueNeeded += BoxDataGridView_CellValueNeeded;
+            //this.boxDataGridView.CellValueNeeded += BoxDataGridView_CellValueNeeded;
             //this.boxDataGridView.SelectionChanged += BoxDataGridView_SelectionChanged;
 
             DataGridViewTextBoxColumn textColumn1 = new DataGridViewTextBoxColumn();
@@ -119,98 +119,173 @@ namespace PackingTracker.UI
         
         void BoxListFrmLoad(object sender, EventArgs e)
 		{
-			ListBox();
+			ListBoxAsync();
 		}
-		
-		public void ListBox()
-		{
+
+        public async void ListBoxAsync()
+        {
             //innerBoxButton.Enabled = outerBoxButton.Enabled = devOuterBoxButton.Enabled = false;
 
-			var request = new RestRequest("dlicense/v2/manu/boxing/listboxbyworkform", Method.POST);
+            var request = new RestRequest("dlicense/v2/manu/boxing/listboxbyworkform", Method.POST);
             request.ReadWriteTimeout = 5000;
 
             request.RequestFormat = DataFormat.Json;
-			request.AddHeader("reqUserId", SharedApp.Instance.Login.Userid);
+            request.AddHeader("reqUserId", SharedApp.Instance.Login.Userid);
             request.AddHeader("reqUserSession", SharedApp.Instance.Login.Loginsession);
             request.AddHeader("grouptype", SharedApp.Instance.AccountDetail.Grouptype);
             request.AddHeader("OemfactoryId", SharedApp.Instance.AccountDetail.OemfactoryId);
-            
+
             StringBuilder sb = new StringBuilder();
             sb.Append("{");
             sb.Append("\"orderid\":");
             sb.Append("\"").Append(OrderDetail.OrderId).Append("\"");
             sb.Append("}");
-            
+
             string body = sb.ToString();
 
             request.AddParameter("application/json", body, ParameterType.RequestBody);
             request.OnBeforeDeserialization = resp => { resp.ContentType = "application/json"; };
-            
-            var asyncHandle = client.ExecuteAsync<Box>(request, response => {
-                if (response.IsSuccessful)
-	            {
-	                Box boxRes = response.Data;
-	                if(boxRes != null)
-	                {
-	                    if(boxRes.Status != 0)
-	                    {
-	                	    ShowError(boxRes.Msg);
-	                    }
-	                    else
-	                    {
-	                	    if(boxRes.retdata == null)
-	                	    {
-	                		    ShowError("无返回值");
-	                	    }
-	                	    else
-	                	    {
-	                		    if(boxRes.retdata.BoxList != null && boxRes.retdata.BoxList.Count > 0)
-	                		    {
-                                    List<BoxDetail> boxDetailList = new List<BoxDetail>();
-                                    foreach (BoxList list in boxRes.retdata.BoxList)
-                                    {
-                                        if (list.BoxSN != null)
-                                        {
-                                            foreach (string boxSN in list.BoxSN)
-                                            {
-                                                BoxDetail d = new BoxDetail();
-                                                d.BoxSN = boxSN;
-                                                d.BoxType = list.BoxType;
-                                                boxDetailList.Add(d);
-                                            }
-                                        }
 
-                                    }
-                                    DetailList = boxDetailList;
-                                    
-                                    synchronizationContext.Post(new SendOrPostCallback(o =>
+            //await GetBoxDetail(cts.Token);
+
+            IRestResponse<Box> response = client.Execute<Box>(request);
+            if (response.IsSuccessful)
+            {
+                Box boxRes = response.Data;
+                if (boxRes != null)
+                {
+                    if (boxRes.Status != 0)
+                    {
+                        ShowError(boxRes.Msg);
+                    }
+                    else
+                    {
+                        if (boxRes.retdata == null)
+                        {
+                            ShowError("无返回值");
+                        }
+                        else
+                        {
+                            if (boxRes.retdata.BoxList != null && boxRes.retdata.BoxList.Count > 0)
+                            {
+                                List<BoxDetail> boxDetailList = new List<BoxDetail>();
+                                foreach (BoxList list in boxRes.retdata.BoxList)
+                                {
+                                    if (list.BoxSN != null)
                                     {
-                                        //var source = new BindingSource(DetailList, null);
-                                        boxDataGridView.RowCount = DetailList.Count;
-                                        boxDataGridView.AutoResizeColumns(DataGridViewAutoSizeColumnsMode.DisplayedCells);
-                                        
-                                    }), null);                                    
+                                        foreach (string boxSN in list.BoxSN)
+                                        {
+                                            BoxDetail d = new BoxDetail();
+                                            d.BoxSN = boxSN;
+                                            d.BoxType = list.BoxType;
+                                            boxDetailList.Add(d);
+                                        }
+                                    }
+
                                 }
-	                		    else
-	                		    {
-	                			    ShowError("无箱子");
-	                		    }
-	                	    }
-	                    }
-	                    
-	                }
-	                else
-	                {
-	                    ShowError("转换错误");
-	                }
-	            }
-	            else
-	            {
-	                ShowError(response.ErrorMessage);
-	            }
-            
-            });
+                                DetailList = boxDetailList;
+
+                                var source = new BindingSource(DetailList, null);
+                                //boxDataGridView.RowCount = DetailList.Count;
+                                boxDataGridView.DataSource = source;
+                                boxDataGridView.AutoResizeColumns(DataGridViewAutoSizeColumnsMode.DisplayedCells);
+                                for (int i = 1; i <= boxDataGridView.Rows.Count; i++)
+                                {
+                                    boxDataGridView.Rows[i - 1].HeaderCell.Value = i.ToString();
+                                }
+                                boxDataGridView.AutoResizeRowHeadersWidth(DataGridViewRowHeadersWidthSizeMode.AutoSizeToAllHeaders);
+                                await GetBoxDetail(cts.Token);
+                            }
+                            else
+                            {
+                                ShowError("无箱子");
+                            }
+                        }
+                    }
+
+                }
+                else
+                {
+                    ShowError("转换错误");
+                }
+            }
+            else
+            {
+                ShowError(response.ErrorMessage);
+            }
+            //var asyncHandle = client.ExecuteAsync<Box>(request, response =>
+            //{
+
+
+            //});
         }
+
+        private async Task GetBoxDetail(CancellationToken cancelToken)
+        {
+            await Task.Run(() =>
+            {
+                for (int i = 0; i < DetailList.Count; i++)
+                {
+                    if (cancelToken.IsCancellationRequested)
+                    {
+                        Console.WriteLine("cancelToken");
+                        return;
+                    }
+                    BoxDetail b = DetailList[i];
+
+                    var request = new RestRequest("dlicense/v2/manu/boxing/queryboxinfo", Method.POST);
+                    request.RequestFormat = DataFormat.Json;
+                    request.ReadWriteTimeout = 5000;
+                    request.AddHeader("reqUserId", SharedApp.Instance.Login.Userid);
+                    request.AddHeader("reqUserSession", SharedApp.Instance.Login.Loginsession);
+                    request.AddHeader("grouptype", SharedApp.Instance.AccountDetail.Grouptype);
+                    request.AddHeader("OemfactoryId", SharedApp.Instance.AccountDetail.OemfactoryId);
+                    request.OnBeforeDeserialization = resp => { resp.ContentType = "application/json"; };
+
+                    //Console.WriteLine("GetBoxDetail:" + rowIndex);
+
+
+                    //调用RestAPI
+                    StringBuilder sb = new StringBuilder();
+                    sb.Append("{");
+                    sb.Append("\"boxsn\":");
+                    sb.Append("\"").Append(b.BoxSN).Append("\"");
+                    sb.Append("}");
+
+                    string body = sb.ToString();
+                    request.AddParameter("application/json", body, ParameterType.RequestBody);
+                    IRestResponse<BoxQuery> response = client.Execute<BoxQuery>(request);
+                    //取消调用
+                    if (cancelToken.IsCancellationRequested)
+                    {
+                        Console.WriteLine("cancelToken");
+                        return;
+                    }
+                    BoxQuery boxQuery = response.Data;
+                    if (response.IsSuccessful && boxQuery != null && boxQuery.retdata != null)
+                    {
+                        if (boxQuery.retdata.BoxInfo != null)
+                        {
+                            b.OrderId = boxQuery.retdata.BoxInfo.OrderId;
+                            b.CreateTime = boxQuery.retdata.BoxInfo.CreateTime;
+                            b.FinishTime = boxQuery.retdata.BoxInfo.FinishTime;
+                            b.Status = boxQuery.retdata.BoxInfo.Status;
+                            b.Occupied = boxQuery.retdata.BoxInfo.Occupied;
+                            b.Capacity = boxQuery.retdata.BoxInfo.Capacity;
+                            b.RealCount = boxQuery.retdata.BoxInfo.RealCount;
+                        }
+                        
+                        synchronizationContext.Post(new SendOrPostCallback(o =>
+                        {
+                            int r = (int) o;
+                            boxDataGridView.InvalidateRow(r);
+
+                        }), i);
+                    }
+                    //return;
+                }
+            });
+        }            
 
         public static object GetPropValue(object src, string propName)
         {
@@ -229,25 +304,42 @@ namespace PackingTracker.UI
 
                 DataGridViewColumn column = boxDataGridView.Columns[e.ColumnIndex];
                 string propertyName = column.DataPropertyName;
-                e.Value = GetPropValue(box, propertyName);
-
-                if (String.IsNullOrEmpty(box.CreateTime))
+                string value = GetPropValue(box, propertyName) as string;
+                if ("CreateTime" == propertyName && String.IsNullOrEmpty(value))
                 {
-                    await GetBoxDetail(cts.Token, e.RowIndex);
-                }                
+                    e.Value = await GetBoxDetail(cts.Token, e.RowIndex);
+                    Console.WriteLine("");
+                    boxDataGridView.Rows[e.RowIndex].Cells[3].Value = box.FinishTime;
+                    boxDataGridView.Rows[e.RowIndex].Cells[4].Value = box.Status;
+                    boxDataGridView.Rows[e.RowIndex].Cells[5].Value = box.Occupied;
+                    boxDataGridView.Rows[e.RowIndex].Cells[6].Value = box.Capacity;
+                    boxDataGridView.Rows[e.RowIndex].Cells[7].Value = box.RealCount;
+                }
+                else
+                {
+                    e.Value = value;
+                }
+                
+
+                //if (String.IsNullOrEmpty(box.CreateTime))
+                //{
+                //    await GetBoxDetail(cts.Token, e.RowIndex);
+                //}                
             }
         }
 
-        private async Task<int> GetBoxDetail(CancellationToken cancelToken, int rowIndex)
+        private async Task<string> GetBoxDetail(CancellationToken cancelToken, int rowIndex)
         {
+            BoxDetail box = DetailList[rowIndex];
+
             if (cancelToken.IsCancellationRequested)
             {
                 Console.WriteLine("cancelToken");
-                return rowIndex;
+                return box.CreateTime;
             }
-            await Task.Run(() =>
+            return await Task.Run(() =>
             {
-                BoxDetail box = DetailList[rowIndex];
+                
                 var request = new RestRequest("dlicense/v2/manu/boxing/queryboxinfo", Method.POST);
                 request.RequestFormat = DataFormat.Json;
                 request.ReadWriteTimeout = 5000;
@@ -259,13 +351,13 @@ namespace PackingTracker.UI
 
                 Console.WriteLine("GetBoxDetail:" + rowIndex);
 
-                
+                //取消调用
                 if (cancelToken.IsCancellationRequested)
                 {
                     Console.WriteLine("cancelToken");
-                    return;
+                    return box.CreateTime;
                 }
-
+                //调用RestAPI
                 StringBuilder sb = new StringBuilder();
                 sb.Append("{");
                 sb.Append("\"boxsn\":");
@@ -275,10 +367,11 @@ namespace PackingTracker.UI
                 string body = sb.ToString();
                 request.AddParameter("application/json", body, ParameterType.RequestBody);
                 IRestResponse<BoxQuery> response = client.Execute<BoxQuery>(request);
+                //取消调用
                 if (cancelToken.IsCancellationRequested)
                 {
                     Console.WriteLine("cancelToken");
-                    return;
+                    return box.CreateTime;
                 }
                 BoxQuery boxQuery = response.Data;
                 if (response.IsSuccessful && boxQuery != null && boxQuery.retdata != null)
@@ -295,19 +388,19 @@ namespace PackingTracker.UI
                         box.RealCount = b.RealCount;
                     }
 
-                    synchronizationContext.Post(new SendOrPostCallback(o =>
-                    {
-                        Console.WriteLine("InvalidateRow:" + rowIndex);
-                        if (rowIndex > -1 && rowIndex < DetailList.Count)
-                        {
-                            boxDataGridView.InvalidateRow(rowIndex);
-                            boxDataGridView.AutoResizeColumns(DataGridViewAutoSizeColumnsMode.DisplayedCells);
-                        }
+                    //synchronizationContext.Post(new SendOrPostCallback(o =>
+                    //{
+                    //    Console.WriteLine("InvalidateRow:" + rowIndex);
+                    //    if (rowIndex > -1 && rowIndex < DetailList.Count)
+                    //    {
+                    //        boxDataGridView.InvalidateRow(rowIndex);
+                    //        boxDataGridView.AutoResizeColumns(DataGridViewAutoSizeColumnsMode.DisplayedCells);
+                    //    }
 
-                    }), null);
+                    //}), null);
                 }
+                return box.CreateTime;
             });
-            return rowIndex;
         }
 		
 		private void ShowError(string errMsg)

@@ -56,6 +56,7 @@ namespace PackingTracker.UI
             //箱子详细
             this.Box = new Box();
             this.Box.retdata.BoxInfo = boxDetail;
+            //订单信息
             this.OrderDetail = od;
 
             synchronizationContext = SynchronizationContext.Current;
@@ -80,29 +81,10 @@ namespace PackingTracker.UI
         {
             UpdateView();
         }
-
-        void UpdateDevView()
-        {
-            deviceDataGridView.RowCount = (this.Box.retdata.DevInfo == null ? 0 : this.Box.retdata.DevInfo.Count+9)/10;
-            deviceDataGridView.Invalidate();
-            for (int i = 1; i <= deviceDataGridView.Rows.Count; i++)
-            {
-                deviceDataGridView.Rows[i - 1].HeaderCell.Value = i.ToString();
-            }
-            deviceDataGridView.AutoResizeRowHeadersWidth(DataGridViewRowHeadersWidthSizeMode.AutoSizeToAllHeaders);
-        }
-
-        private void DeviceDataGridView_CellValueNeeded(object sender, DataGridViewCellValueEventArgs e)
-        {
-            e.Value = "";
-            int index = e.RowIndex * 10 + e.ColumnIndex;
-            if(index > -1 && index < this.Box.retdata.DevInfo.Count)
-            {
-                DevInfo devInfo = this.Box.retdata.DevInfo[index];
-                e.Value = devInfo.Did;
-            }
-        }
-
+        
+        /// <summary>
+        /// 更新窗口显示
+        /// </summary>
         void UpdateView()
         {
             //箱子类型
@@ -126,8 +108,7 @@ namespace PackingTracker.UI
             boxSizeTextBox.Text = String.Format("{0}", this.Box.retdata.BoxInfo.Capacity);
             realCountTextBox.Text = String.Format("{0}", this.Box.retdata.BoxInfo.RealCount);
             realCount = this.Box.retdata.BoxInfo.RealCount;
-
-            if(this.Box.retdata.BoxInfo.BoxType == Constants.BoxTypeInner)
+            if (this.Box.retdata.BoxInfo.BoxType == Constants.BoxTypeInner)
             {
                 prompLabel.Text = "请输入DID/MAC";
             }
@@ -135,6 +116,7 @@ namespace PackingTracker.UI
             {
                 prompLabel.Text = "请输入内箱号";
             }
+
             //若无箱号，新建箱子
             if (String.IsNullOrEmpty(this.Box.retdata.BoxInfo.BoxSN))
             {
@@ -151,8 +133,19 @@ namespace PackingTracker.UI
                 deviceInputTextBox.Enabled = true;
 
                 //查询箱内设备
-                QueryBoxDev();
+                if (this.Box.retdata.BoxInfo.BoxType == Constants.BoxTypeInner)
+                {
+                    //查询内箱内设备
+                    QueryBoxDev();
+                }
+                else
+                {
+                    //查询外箱内内箱
+                    QueryInnerBox();
+                }
             }
+
+
         }
 
         /// <summary>
@@ -225,11 +218,154 @@ namespace PackingTracker.UI
                     ShowError(-1);
                 }
             });
-
-            //IRestResponse<Box> res = client.Execute<Box>(request);
-
-            
         }
+
+        /// <summary>
+        /// 显示内箱内设备
+        /// </summary>
+        void UpdateDevView()
+        {
+            deviceDataGridView.RowCount = (this.Box.retdata.DevInfo == null ? 0 : this.Box.retdata.DevInfo.Count + 9) / 10;
+            deviceDataGridView.Invalidate();
+            for (int i = 1; i <= deviceDataGridView.Rows.Count; i++)
+            {
+                deviceDataGridView.Rows[i - 1].HeaderCell.Value = i.ToString();
+            }
+            deviceDataGridView.AutoResizeRowHeadersWidth(DataGridViewRowHeadersWidthSizeMode.AutoSizeToAllHeaders);
+        }
+
+        private void DeviceDataGridView_CellValueNeeded(object sender, DataGridViewCellValueEventArgs e)
+        {
+            e.Value = "";
+            int index = e.RowIndex * 10 + e.ColumnIndex;
+            if (index > -1 && index < this.Box.retdata.DevInfo.Count)
+            {
+                DevInfo devInfo = this.Box.retdata.DevInfo[index];
+                e.Value = devInfo.Did;
+            }
+        }
+
+        /// <summary>
+        /// 查询外箱里的内箱
+        /// </summary>
+        void QueryInnerBox()
+        {
+            var request = new RestRequest("dlicense/v2/manu/boxing/listinnerbox", Method.POST);
+            request.RequestFormat = DataFormat.Json;
+            request.AddHeader("reqUserId", SharedApp.Instance.Login.Userid);
+            request.AddHeader("reqUserSession", SharedApp.Instance.Login.Loginsession);
+            request.AddHeader("grouptype", SharedApp.Instance.AccountDetail.Grouptype);
+            request.AddHeader("OemfactoryId", SharedApp.Instance.AccountDetail.OemfactoryId);
+
+            StringBuilder sb = new StringBuilder();
+            sb.Append("{");
+            sb.Append("\"boxsn\":");
+            sb.Append("\"").Append(this.Box.retdata.BoxInfo.BoxSN).Append("\"");
+            sb.Append("}");
+
+            string body = sb.ToString();
+            Console.WriteLine(body);
+            request.AddParameter("application/json", body, ParameterType.RequestBody);
+            request.OnBeforeDeserialization = resp => { resp.ContentType = "application/json"; };
+            request.ReadWriteTimeout = 5000;
+
+            var asyncHandle = client.ExecuteAsync<Box>(request, res =>
+            {
+                if (res.IsSuccessful)
+                {
+                    Box box = res.Data;
+                    if (box != null && box.retdata != null)
+                    {
+                        if (box.Status != 0)
+                        {
+                            ShowError(box.Status);
+                        }
+                        else
+                        {
+                            List<string> innerBoxes = box.retdata.BoxSN;
+                            this.Box.retdata.InnerBoxes = new List<BoxDetail>();
+
+                            if (innerBoxes != null)
+                            {
+                                foreach(string sn in innerBoxes)
+                                {
+                                    BoxDetail d = new BoxDetail();
+                                    d.BoxSN = sn;
+                                    this.Box.retdata.InnerBoxes.Add(d);
+                                }
+                            }
+                            QueryBoxInfo();
+                            //synchronizationContext.Post(new SendOrPostCallback(o =>
+                            //{
+                            //    List<string> innerBoxes = o as List<string>;
+                            //    if (innerBoxes != null)
+                            //    {
+                            //        UpdateDevView();
+                            //    }
+                            //}), box.retdata.BoxSN);
+                        }
+                    }
+                    else
+                    {
+                        ShowError(-1);
+                    }
+                }
+                else
+                {
+                    ShowError(-1);
+                }
+            });
+        }
+
+        void QueryBoxInfo()
+        {
+            foreach (BoxDetail d in this.Box.retdata.InnerBoxes)
+            {
+                if(String.IsNullOrEmpty(d.CreateTime))
+                {
+                    var request = new RestRequest("dlicense/v2/manu/boxing/queryboxinfo", Method.POST);
+                    request.RequestFormat = DataFormat.Json;
+                    request.AddHeader("reqUserId", SharedApp.Instance.Login.Userid);
+                    request.AddHeader("reqUserSession", SharedApp.Instance.Login.Loginsession);
+                    request.AddHeader("grouptype", SharedApp.Instance.AccountDetail.Grouptype);
+                    request.AddHeader("OemfactoryId", SharedApp.Instance.AccountDetail.OemfactoryId);
+
+                    StringBuilder sb = new StringBuilder();
+                    sb.Append("{");
+                    sb.Append("\"boxsn\":");
+                    sb.Append("\"").Append(this.Box.retdata.BoxInfo.BoxSN).Append("\"");
+                    sb.Append("}");
+
+                    string body = sb.ToString();
+                    Console.WriteLine(body);
+                    request.AddParameter("application/json", body, ParameterType.RequestBody);
+                    request.OnBeforeDeserialization = resp => { resp.ContentType = "application/json"; };
+                    request.ReadWriteTimeout = 5000;
+                    IRestResponse<BoxQuery> res = client.Execute<BoxQuery>(request);
+                    if(res.IsSuccessful)
+                    {
+                        BoxQuery bq = res.Data;
+                        if(bq != null && bq.Status == 0)
+                        {
+                            BoxDetail bd = bq.retdata.BoxInfo;
+                            d.BoxSN = bd.BoxSN;
+                            d.BoxType = bd.BoxType;
+                            d.Capacity = bd.Capacity;
+                            d.CreateTime = bd.CreateTime;
+                            d.FinishTime = bd.FinishTime;
+                            d.Occupied = bd.Occupied;
+                            d.Oemfactoryid = bd.Oemfactoryid;
+                            d.OrderId = bd.OrderId;
+                            d.RealCount = bd.RealCount;
+                            d.Requserid = bd.Requserid;
+                            d.Status = bd.Status;
+                        }                        
+                    }
+                }
+            }
+
+        }
+        
 
 
         /// <summary>
