@@ -40,7 +40,7 @@ namespace PackingTracker.UI
 
         private CancellationTokenSource cts = new CancellationTokenSource();
 
-        public BoxListFrm(OrderDetail orderDetail)
+         public BoxListFrm(OrderDetail orderDetail)
 		{
 			//
 			// The InitializeComponent() call is required for Windows Forms designer support.
@@ -103,6 +103,7 @@ namespace PackingTracker.UI
             boxDataGridView.AutoResizeColumns(DataGridViewAutoSizeColumnsMode.DisplayedCells);
 
             boxDataGridView.AllowUserToAddRows = false;
+            
 
             synchronizationContext = SynchronizationContext.Current;
 			
@@ -431,6 +432,10 @@ namespace PackingTracker.UI
 
 		void BoxDataGridViewCellMouseDoubleClick(object sender, DataGridViewCellMouseEventArgs e)
 		{
+            if(e.Button != MouseButtons.Left)
+            {
+                return;
+            }
 			if(DetailList.Count > e.RowIndex && e.RowIndex >= 0)
 			{
 				BoxDetail box = DetailList[e.RowIndex];
@@ -489,6 +494,66 @@ namespace PackingTracker.UI
             if (e.KeyCode == Keys.Escape)
             {
                 this.Close();
+            }
+        }
+
+        private void devOuterBoxButton_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void deleteBoxButton_Click(object sender, EventArgs e)
+        {
+            if(boxDataGridView.SelectedRows.Count == 0)
+            {
+                MessageBox.Show("请先选择一个箱子", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            int index = boxDataGridView.SelectedRows[0].Index;
+            BoxDetail box = DetailList[index];
+
+            if (MessageBox.Show(String.Format("确定要删除箱子:{0}吗", box.BoxSN), "确认", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+            {
+                var request = new RestRequest("dlicense/v2/manu/boxing/dropbox", Method.POST);
+                request.RequestFormat = DataFormat.Json;
+                request.ReadWriteTimeout = 5000;
+                request.AddHeader("reqUserId", SharedApp.Instance.Login.Userid);
+                request.AddHeader("reqUserSession", SharedApp.Instance.Login.Loginsession);
+                request.AddHeader("grouptype", SharedApp.Instance.AccountDetail.Grouptype);
+                request.AddHeader("OemfactoryId", SharedApp.Instance.AccountDetail.OemfactoryId);
+                request.OnBeforeDeserialization = resp => { resp.ContentType = "application/json"; };
+                
+                //调用RestAPI
+                StringBuilder sb = new StringBuilder();
+                sb.Append("{");
+                sb.Append("\"orderid\":");
+                sb.Append("\"").Append(box.OrderId).Append("\",");
+                sb.Append("\"boxsn\":");
+                sb.Append("\"").Append(box.BoxSN).Append("\"");
+                sb.Append("}");
+
+                string body = sb.ToString();
+                request.AddParameter("application/json", body, ParameterType.RequestBody);
+                IRestResponse<Res> response = client.Execute<Res>(request);
+                Res r = response.Data;
+                if (response.IsSuccessful && r != null && r.Status == 0)
+                {
+                    DetailList.RemoveAt(index);
+                    var source = new BindingSource(DetailList, null);
+                    boxDataGridView.DataSource = source;
+                    boxDataGridView.AutoResizeColumns(DataGridViewAutoSizeColumnsMode.DisplayedCells);
+                }
+                else
+                {
+                    string msg = response.ErrorMessage;
+                    if (r != null && r.Status != 0)
+                    {
+                        msg = Constants.GetError(r.Status);
+                    }
+                    
+                    MessageBox.Show("无法删除箱子:" + msg, "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
             }
         }
     }

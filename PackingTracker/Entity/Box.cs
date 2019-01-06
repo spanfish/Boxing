@@ -3,14 +3,20 @@ using System.Collections.Generic;
 
 namespace PackingTracker.Entity
 {
+    public class Res
+    {
+        public int Status { get; set; }
+
+        public string Msg { get; set; }
+    }
 	/// <summary>
 	/// Description of Box.
 	/// </summary>
-	public class Box
-	{
-		public int Status { get; set; }
+	public class Box : Res
+    {
+		//public int Status { get; set; }
 
-        public string Msg { get; set; }
+  //      public string Msg { get; set; }
         
         public RetData retdata{get;set;}
 

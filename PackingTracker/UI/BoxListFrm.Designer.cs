@@ -50,6 +50,7 @@ namespace PackingTracker.UI
             this.refreshButton = new System.Windows.Forms.Button();
             this.tableLayoutPanel3 = new System.Windows.Forms.TableLayoutPanel();
             this.boxDataGridView = new System.Windows.Forms.DataGridView();
+            this.deleteBoxButton = new System.Windows.Forms.Button();
             this.tableLayoutPanel1.SuspendLayout();
             this.tableLayoutPanel2.SuspendLayout();
             this.tableLayoutPanel3.SuspendLayout();
@@ -85,6 +86,7 @@ namespace PackingTracker.UI
             this.tableLayoutPanel2.Controls.Add(this.devOuterBoxButton, 1, 0);
             this.tableLayoutPanel2.Controls.Add(this.printLabelButton, 4, 0);
             this.tableLayoutPanel2.Controls.Add(this.refreshButton, 3, 0);
+            this.tableLayoutPanel2.Controls.Add(this.deleteBoxButton, 5, 0);
             this.tableLayoutPanel2.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tableLayoutPanel2.Location = new System.Drawing.Point(3, 3);
             this.tableLayoutPanel2.Name = "tableLayoutPanel2";
@@ -122,6 +124,7 @@ namespace PackingTracker.UI
             this.devOuterBoxButton.TabIndex = 1;
             this.devOuterBoxButton.Text = "设备外箱";
             this.devOuterBoxButton.UseVisualStyleBackColor = true;
+            this.devOuterBoxButton.Click += new System.EventHandler(this.devOuterBoxButton_Click);
             // 
             // printLabelButton
             // 
@@ -168,6 +171,16 @@ namespace PackingTracker.UI
             this.boxDataGridView.TabIndex = 0;
             this.boxDataGridView.CellMouseDoubleClick += new System.Windows.Forms.DataGridViewCellMouseEventHandler(this.BoxDataGridViewCellMouseDoubleClick);
             // 
+            // deleteBoxButton
+            // 
+            this.deleteBoxButton.Location = new System.Drawing.Point(403, 3);
+            this.deleteBoxButton.Name = "deleteBoxButton";
+            this.deleteBoxButton.Size = new System.Drawing.Size(74, 28);
+            this.deleteBoxButton.TabIndex = 5;
+            this.deleteBoxButton.Text = "删除箱子";
+            this.deleteBoxButton.UseVisualStyleBackColor = true;
+            this.deleteBoxButton.Click += new System.EventHandler(this.deleteBoxButton_Click);
+            // 
             // BoxListFrm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
@@ -193,5 +206,6 @@ namespace PackingTracker.UI
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel3;
         private System.Windows.Forms.DataGridView boxDataGridView;
         private System.Windows.Forms.Button refreshButton;
+        private System.Windows.Forms.Button deleteBoxButton;
     }
 }
