@@ -103,8 +103,8 @@ namespace PackingTracker.UI
             boxDataGridView.AutoResizeColumns(DataGridViewAutoSizeColumnsMode.DisplayedCells);
 
             boxDataGridView.AllowUserToAddRows = false;
-            
 
+            boxDataGridView.CellFormatting += BoxDataGridView_CellFormatting;
             synchronizationContext = SynchronizationContext.Current;
 			
             string host = Constants.Host;
@@ -117,7 +117,40 @@ namespace PackingTracker.UI
             //cts = new CancellationTokenSource();
             #endregion
         }
-        
+
+        private void BoxDataGridView_CellFormatting(object sender, DataGridViewCellFormattingEventArgs e)
+        {
+            if(e.RowIndex > -1 && e.ColumnIndex > -1)
+            {
+                BoxDetail b = DetailList[e.RowIndex];
+                if(boxDataGridView.Columns[e.ColumnIndex].Name == "Status")
+                {
+                    if(b.Status == "complete")
+                    {
+                        e.Value = "装箱完成";
+                    }
+                    else if (String.IsNullOrEmpty(b.Status))
+                    {
+                        e.Value = "";
+                    }
+                    else
+                    {
+                        e.Value = "正在装箱";
+                    }
+                }
+                if (b.Status == "complete")
+                {
+                    e.CellStyle.BackColor = Color.Gray;
+                    e.CellStyle.ForeColor = Color.Blue;
+                }
+                else
+                {
+                    e.CellStyle.BackColor = Color.White;
+                    e.CellStyle.ForeColor = Color.Black;
+                }
+            }
+        }
+
         void BoxListFrmLoad(object sender, EventArgs e)
 		{
 			ListBoxAsync();
@@ -125,8 +158,6 @@ namespace PackingTracker.UI
 
         public async void ListBoxAsync()
         {
-            //innerBoxButton.Enabled = outerBoxButton.Enabled = devOuterBoxButton.Enabled = false;
-
             var request = new RestRequest("dlicense/v2/manu/boxing/listboxbyworkform", Method.POST);
             request.ReadWriteTimeout = 5000;
 
@@ -189,12 +220,13 @@ namespace PackingTracker.UI
                                 var source = new BindingSource(DetailList, null);
                                 //boxDataGridView.RowCount = DetailList.Count;
                                 boxDataGridView.DataSource = source;
-                                boxDataGridView.AutoResizeColumns(DataGridViewAutoSizeColumnsMode.DisplayedCells);
+                                
                                 for (int i = 1; i <= boxDataGridView.Rows.Count; i++)
                                 {
                                     boxDataGridView.Rows[i - 1].HeaderCell.Value = i.ToString();
                                 }
                                 boxDataGridView.AutoResizeRowHeadersWidth(DataGridViewRowHeadersWidthSizeMode.AutoSizeToAllHeaders);
+                                boxDataGridView.AutoResizeColumns(DataGridViewAutoSizeColumnsMode.AllCells);
                                 await GetBoxDetail(cts.Token);
                             }
                             else
@@ -278,12 +310,17 @@ namespace PackingTracker.UI
                         
                         synchronizationContext.Post(new SendOrPostCallback(o =>
                         {
-                            int r = (int) o;
-                            boxDataGridView.InvalidateRow(r);
-
+                            int r = (int)o;
+                            BindingSource bs = boxDataGridView.DataSource as BindingSource;
+                            
+                            if (bs != null && r < bs.Count)
+                            {
+                                boxDataGridView.InvalidateRow(r);
+                                boxDataGridView.AutoResizeColumns(DataGridViewAutoSizeColumnsMode.AllCells);
+                            }
+                            
                         }), i);
                     }
-                    //return;
                 }
             });
         }            
@@ -486,7 +523,7 @@ namespace PackingTracker.UI
 
         private void refreshButton_Click_1(object sender, EventArgs e)
         {
-            boxDataGridView.Invalidate();
+            ListBoxAsync();
         }
 
         private void BoxListFrm_KeyDown(object sender, KeyEventArgs e)
@@ -554,6 +591,86 @@ namespace PackingTracker.UI
                     
                     MessageBox.Show("无法删除箱子:" + msg, "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
+            }
+        }
+
+        private void BoxListFrm_Activated(object sender, EventArgs e)
+        {
+            boxDataGridView.Invalidate();
+        }
+
+        private void searchBoxButton_Click(object sender, EventArgs e)
+        {
+            var request = new RestRequest("dlicense/v2/manu/boxing/queryboxbydev", Method.POST);
+            request.RequestFormat = DataFormat.Json;
+            request.ReadWriteTimeout = 5000;
+            request.AddHeader("reqUserId", SharedApp.Instance.Login.Userid);
+            request.AddHeader("reqUserSession", SharedApp.Instance.Login.Loginsession);
+            request.AddHeader("grouptype", SharedApp.Instance.AccountDetail.Grouptype);
+            request.AddHeader("OemfactoryId", SharedApp.Instance.AccountDetail.OemfactoryId);
+            request.OnBeforeDeserialization = resp => { resp.ContentType = "application/json"; };
+
+            string did = searchBoxTextBox.Text;
+            if (did.StartsWith("NC"))
+            {
+                int index = did.IndexOf("-");
+                if (index >= 0)
+                {
+                    did = did.Substring(index + 1);
+                }
+            }
+
+            //调用RestAPI
+            StringBuilder sb = new StringBuilder();
+            sb.Append("{");
+            //sb.Append("\"orderid\":");
+            //sb.Append("\"").Append(box.OrderId).Append("\",");
+            sb.Append("\"did\":");
+            sb.Append("\"").Append(did).Append("\"");
+            sb.Append("}");
+
+            string body = sb.ToString();
+            request.AddParameter("application/json", body, ParameterType.RequestBody);
+            IRestResponse<BoxQueryByDid> response = client.Execute<BoxQueryByDid>(request);
+            BoxQueryByDid r = response.Data;
+            if (response.IsSuccessful && r != null && r.Status == 0)
+            {
+                if(r.retdata.BoxInfo != null && r.retdata.BoxInfo.Count > 0)
+                {
+                    this.OrderDetail = new OrderDetail();
+                    this.OrderDetail.OrderId = r.retdata.BoxInfo[0].OrderId;
+
+                    this.Text = "装箱列表[订单:" + OrderDetail.OrderId + "]";
+
+                    DetailList = new List<BoxDetail>();
+                    foreach (BoxDetail bd in r.retdata.BoxInfo)
+                    {
+                        DetailList.Add(bd);
+                    }
+                    var source = new BindingSource(DetailList, null);
+                    boxDataGridView.DataSource = source;
+
+                    for (int i = 1; i <= boxDataGridView.Rows.Count; i++)
+                    {
+                        boxDataGridView.Rows[i - 1].HeaderCell.Value = i.ToString();
+                    }
+                    boxDataGridView.AutoResizeRowHeadersWidth(DataGridViewRowHeadersWidthSizeMode.AutoSizeToAllHeaders);
+                    boxDataGridView.AutoResizeColumns(DataGridViewAutoSizeColumnsMode.AllCells);
+                }
+                else
+                {
+                    MessageBox.Show("未找到箱子", "信息", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }                
+            }
+            else
+            {
+                string msg = response.ErrorMessage;
+                if (r != null && r.Status != 0)
+                {
+                    msg = Constants.GetError(r.Status);
+                }
+
+                MessageBox.Show("检索箱子出错:" + msg, "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
     }

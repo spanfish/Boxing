@@ -82,6 +82,7 @@ namespace PackingTracker.UI
             this.panel1 = new System.Windows.Forms.Panel();
             this.panel2 = new System.Windows.Forms.Panel();
             this.msgLabel = new System.Windows.Forms.Label();
+            this.exportDidButton = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.deviceDataGridView)).BeginInit();
             this.tableLayoutPanel1.SuspendLayout();
             this.panel1.SuspendLayout();
@@ -369,6 +370,7 @@ namespace PackingTracker.UI
             // 
             // panel2
             // 
+            this.panel2.Controls.Add(this.exportDidButton);
             this.panel2.Controls.Add(this.prompLabel);
             this.panel2.Controls.Add(this.unboundCheckbox);
             this.panel2.Controls.Add(this.packingCompButon);
@@ -392,6 +394,17 @@ namespace PackingTracker.UI
             this.msgLabel.Name = "msgLabel";
             this.msgLabel.Size = new System.Drawing.Size(781, 78);
             this.msgLabel.TabIndex = 23;
+            // 
+            // exportDidButton
+            // 
+            this.exportDidButton.Location = new System.Drawing.Point(767, 5);
+            this.exportDidButton.Name = "exportDidButton";
+            this.exportDidButton.Size = new System.Drawing.Size(75, 23);
+            this.exportDidButton.TabIndex = 25;
+            this.exportDidButton.Text = "导出设备号";
+            this.exportDidButton.UseVisualStyleBackColor = true;
+            this.exportDidButton.Visible = false;
+            this.exportDidButton.Click += new System.EventHandler(this.exportDidButton_Click);
             // 
             // PackingFrm
             // 
@@ -435,5 +448,6 @@ namespace PackingTracker.UI
         private System.Windows.Forms.Panel panel1;
         private System.Windows.Forms.Panel panel2;
         private System.Windows.Forms.Label msgLabel;
+        private System.Windows.Forms.Button exportDidButton;
     }
 }

@@ -51,10 +51,14 @@ namespace PackingTracker.UI
             this.tableLayoutPanel3 = new System.Windows.Forms.TableLayoutPanel();
             this.boxDataGridView = new System.Windows.Forms.DataGridView();
             this.deleteBoxButton = new System.Windows.Forms.Button();
+            this.panel1 = new System.Windows.Forms.Panel();
+            this.searchBoxButton = new System.Windows.Forms.Button();
+            this.searchBoxTextBox = new System.Windows.Forms.TextBox();
             this.tableLayoutPanel1.SuspendLayout();
             this.tableLayoutPanel2.SuspendLayout();
             this.tableLayoutPanel3.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.boxDataGridView)).BeginInit();
+            this.panel1.SuspendLayout();
             this.SuspendLayout();
             // 
             // tableLayoutPanel1
@@ -74,19 +78,22 @@ namespace PackingTracker.UI
             // 
             // tableLayoutPanel2
             // 
-            this.tableLayoutPanel2.ColumnCount = 6;
+            this.tableLayoutPanel2.ColumnCount = 8;
             this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 80F));
             this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 80F));
             this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 80F));
             this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 80F));
             this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 80F));
-            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 602F));
+            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 231F));
+            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 9F));
+            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
             this.tableLayoutPanel2.Controls.Add(this.outerBoxButton, 0, 0);
             this.tableLayoutPanel2.Controls.Add(this.innerBoxButton, 0, 0);
             this.tableLayoutPanel2.Controls.Add(this.devOuterBoxButton, 1, 0);
             this.tableLayoutPanel2.Controls.Add(this.printLabelButton, 4, 0);
             this.tableLayoutPanel2.Controls.Add(this.refreshButton, 3, 0);
-            this.tableLayoutPanel2.Controls.Add(this.deleteBoxButton, 5, 0);
+            this.tableLayoutPanel2.Controls.Add(this.deleteBoxButton, 7, 0);
+            this.tableLayoutPanel2.Controls.Add(this.panel1, 5, 0);
             this.tableLayoutPanel2.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tableLayoutPanel2.Location = new System.Drawing.Point(3, 3);
             this.tableLayoutPanel2.Name = "tableLayoutPanel2";
@@ -124,6 +131,7 @@ namespace PackingTracker.UI
             this.devOuterBoxButton.TabIndex = 1;
             this.devOuterBoxButton.Text = "设备外箱";
             this.devOuterBoxButton.UseVisualStyleBackColor = true;
+            this.devOuterBoxButton.Visible = false;
             this.devOuterBoxButton.Click += new System.EventHandler(this.devOuterBoxButton_Click);
             // 
             // printLabelButton
@@ -173,13 +181,40 @@ namespace PackingTracker.UI
             // 
             // deleteBoxButton
             // 
-            this.deleteBoxButton.Location = new System.Drawing.Point(403, 3);
+            this.deleteBoxButton.Location = new System.Drawing.Point(643, 3);
             this.deleteBoxButton.Name = "deleteBoxButton";
             this.deleteBoxButton.Size = new System.Drawing.Size(74, 28);
             this.deleteBoxButton.TabIndex = 5;
             this.deleteBoxButton.Text = "删除箱子";
             this.deleteBoxButton.UseVisualStyleBackColor = true;
             this.deleteBoxButton.Click += new System.EventHandler(this.deleteBoxButton_Click);
+            // 
+            // panel1
+            // 
+            this.panel1.Controls.Add(this.searchBoxTextBox);
+            this.panel1.Controls.Add(this.searchBoxButton);
+            this.panel1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.panel1.Location = new System.Drawing.Point(403, 3);
+            this.panel1.Name = "panel1";
+            this.panel1.Size = new System.Drawing.Size(225, 28);
+            this.panel1.TabIndex = 8;
+            // 
+            // searchBoxButton
+            // 
+            this.searchBoxButton.Location = new System.Drawing.Point(156, 0);
+            this.searchBoxButton.Name = "searchBoxButton";
+            this.searchBoxButton.Size = new System.Drawing.Size(66, 28);
+            this.searchBoxButton.TabIndex = 10;
+            this.searchBoxButton.Text = "检索箱子";
+            this.searchBoxButton.UseVisualStyleBackColor = true;
+            this.searchBoxButton.Click += new System.EventHandler(this.searchBoxButton_Click);
+            // 
+            // searchBoxTextBox
+            // 
+            this.searchBoxTextBox.Location = new System.Drawing.Point(3, 5);
+            this.searchBoxTextBox.Name = "searchBoxTextBox";
+            this.searchBoxTextBox.Size = new System.Drawing.Size(153, 19);
+            this.searchBoxTextBox.TabIndex = 11;
             // 
             // BoxListFrm
             // 
@@ -191,6 +226,7 @@ namespace PackingTracker.UI
             this.Name = "BoxListFrm";
             this.Text = "装箱列表";
             this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
+            this.Activated += new System.EventHandler(this.BoxListFrm_Activated);
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.BoxListFrm_FormClosing);
             this.Load += new System.EventHandler(this.BoxListFrmLoad);
             this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.BoxListFrm_KeyDown);
@@ -198,6 +234,8 @@ namespace PackingTracker.UI
             this.tableLayoutPanel2.ResumeLayout(false);
             this.tableLayoutPanel3.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.boxDataGridView)).EndInit();
+            this.panel1.ResumeLayout(false);
+            this.panel1.PerformLayout();
             this.ResumeLayout(false);
 
 		}
@@ -207,5 +245,8 @@ namespace PackingTracker.UI
         private System.Windows.Forms.DataGridView boxDataGridView;
         private System.Windows.Forms.Button refreshButton;
         private System.Windows.Forms.Button deleteBoxButton;
+        private System.Windows.Forms.Panel panel1;
+        private System.Windows.Forms.TextBox searchBoxTextBox;
+        private System.Windows.Forms.Button searchBoxButton;
     }
 }

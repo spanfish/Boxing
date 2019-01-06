@@ -9,38 +9,38 @@ namespace PackingTracker.Entity
 
         public string Msg { get; set; }
     }
-	/// <summary>
-	/// Description of Box.
-	/// </summary>
-	public class Box : Res
+    /// <summary>
+    /// Description of Box.
+    /// </summary>
+    public class Box : Res
     {
-		//public int Status { get; set; }
+        //public int Status { get; set; }
 
-  //      public string Msg { get; set; }
-        
-        public RetData retdata{get;set;}
+        //      public string Msg { get; set; }
+
+        public RetData retdata { get; set; }
 
         public Box()
         {
             this.retdata = new RetData();
         }
-	}
-	
-	
-	
-	public class RetData
-	{
-		public List<BoxList> BoxList
-		{
-			get;
-			set;
-		}
-		
-		public BoxDetail BoxInfo
-		{
-			get;
-			set;
-		}
+    }
+
+
+
+    public class RetData
+    {
+        public List<BoxList> BoxList
+        {
+            get;
+            set;
+        }
+
+        public BoxDetail BoxInfo
+        {
+            get;
+            set;
+        }
 
         public int Count { get; set; }
 
@@ -65,7 +65,7 @@ namespace PackingTracker.Entity
             set;
         }
     }
-	
+
     public class DevInfo
     {
         public string BoxSN { get; set; }
@@ -75,11 +75,11 @@ namespace PackingTracker.Entity
     }
 
     public class BoxList
-	{
-		public string BoxType { get; set; }
+    {
+        public string BoxType { get; set; }
 
         public List<string> BoxSN { get; set; }
-	}
+    }
 
     public class BoxDetail
     {
@@ -105,16 +105,34 @@ namespace PackingTracker.Entity
 
         public int RealCount { get; set; }
     }
-	
-	/// <summary>
-	/// 箱子信息查询
-	/// </summary>
-	public class BoxQuery
-	{
-		public int Status { get; set; }
+
+    /// <summary>
+    /// 箱子信息查询
+    /// </summary>
+    public class BoxQuery
+    {
+        public int Status { get; set; }
 
         public string Msg { get; set; }
-        
-        public RetData retdata{get;set;}
-	}
+
+        public RetData retdata { get; set; }
+    }
+
+    public class BoxQueryByDid
+    {
+        public int Status { get; set; }
+
+        public string Msg { get; set; }
+
+        public BoxQueryByDidRetData retdata { get; set; }
+    }
+
+    public class BoxQueryByDidRetData
+    {
+        public List<BoxDetail> BoxInfo
+        {
+            get;
+            set;
+        }
+    }
 }

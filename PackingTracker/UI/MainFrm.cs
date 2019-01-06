@@ -175,7 +175,10 @@ namespace PackingTracker.UI
 	                        var source = new BindingSource(orderList, null);
 	                        orderDataGridView.DataSource = source;
                             orderDataGridView.AutoResizeColumns(DataGridViewAutoSizeColumnsMode.AllCells);
-                            index = ind;
+                            if(orderList.Count > 0)
+                            {
+                                index = ind;
+                            }                            
                        	}
                        	else
                        	{
@@ -240,7 +243,6 @@ namespace PackingTracker.UI
         private void refreshButton_Click(object sender, EventArgs e)
         {
             ListOrder(index);
-
         }
     }
 }

@@ -192,6 +192,7 @@
             this.button1.TabIndex = 141;
             this.button1.Text = "测试2";
             this.button1.UseVisualStyleBackColor = true;
+            this.button1.Visible = false;
             // 
             // FirmwareTB
             // 
@@ -694,6 +695,7 @@
             this.TestBtn.TabIndex = 97;
             this.TestBtn.Text = "测试";
             this.TestBtn.UseVisualStyleBackColor = true;
+            this.TestBtn.Visible = false;
             this.TestBtn.Click += new System.EventHandler(this.TestBtn_Click);
             // 
             // PreviewLabel

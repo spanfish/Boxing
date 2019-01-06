@@ -28,7 +28,7 @@ namespace PackingTracker.Common
 #if DEBUG
         public static string Host = "https://lifecycle2.ibroadlink.com";
 #else
-		public static string Host = "https://lifecyle2.ibroadlink.com";
+		public static string Host = "https://lifecycle2.ibroadlink.com";
 #endif
 
         public static string GetError(int errCode)
